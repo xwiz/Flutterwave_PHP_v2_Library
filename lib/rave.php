@@ -825,7 +825,7 @@ class Rave {
          *  @param array
          *  @return object
          * */
-     function subaccount($array){
+     function createSubaccount($array){
         $this->options = $array;
         $this->logger->notice('Creating Sub account...');
         //pass $this->options to the postURL function to call the api
