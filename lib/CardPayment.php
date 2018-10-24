@@ -90,14 +90,30 @@ class Card {
             //set the endpoint for the api call
             ->setEndPoint("flwv3-pug/getpaidx/api/charge");
             //returns the value from the results
-            //you can choose to store the returned value in a variable and validate within this function
-            return $this->payment->chargePayment($array);
+            //$result = $this->payment->chargePayment($array);
+            $result = $this->payment->chargePayment($array);
+           
+                //check the value of the returned data for the suggested_auth response
+             if(isset($result["data"]["suggested_auth"])){
+                 if($result["data"]["suggested_auth"] === "PIN"){
+                     //validates the pin on the request data
+                     $array["suggested_auth"] = "PIN";
+                     return $this->payment->chargePayment($array);
+                 }elseif($result["data"]["suggested_auth"] === "NOAUTH_INTERNATIONAL"){
+                    $array["suggested_auth"] = "NOAUTH_INTERNATIONAL";
+     
+                     //TODO: Update $this->options with the billing addres details
+                     //$this->chargePayment($this->options) //uncomment this function when charging international cards
+                 }
+             } 
+          
+
             /**you will need to validate and verify the charge
              * Validating the charge will require an otp
              * After validation then verify the charge with the txRef
              * You can write out your function to execute when the verification is successful in the onSuccessful function
              ***/
-
+            
             //validate the charge
             //$payment->validateTransaction($otp)//Uncomment this line if you need it
              //verify the charge

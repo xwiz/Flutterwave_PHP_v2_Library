@@ -644,27 +644,13 @@ class Rave {
      * */
 
     function cURL($data){
-        $curl = curl_init();
-		curl_setopt_array($curl, array(
-		  CURLOPT_URL => $this->baseUrl.'/'.$this->end_point,
-		  CURLOPT_RETURNTRANSFER => true,
-		  CURLOPT_CUSTOMREQUEST => "POST",
-		  CURLOPT_POSTFIELDS => json_encode($data),
+        // make request to endpoint using unirest.
+        $headers = array('Content-Type' => 'application/json');
+        $body = Body::json($data);
+        $url = $this->baseUrl.'/'.$this->end_point;
 
-		  CURLOPT_HTTPHEADER => [
-		    "content-type: application/json",
-		    "cache-control: no-cache"
-		  ],
-		));
-       
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        if($err){
-            // there was an error contacting the rave API
-           return $err;
-          }else{
-            return $response;
-          }
+        $response = Request::post($url, $headers, $body);
+        return $response->raw_body;    // Unparsed body
      }
      /**
      * verify the transaction before giving value to your customers
@@ -805,10 +791,15 @@ class Rave {
         $this->logger->notice('Payment requires validation..'); 
         // the result returned requires validation
         $result = json_decode($result, true);
-        //passes the result to the suggestedAuth function which re-initiates the charge 
-        return $this->suggestedAuth($result);
 
-       
+        if(isset($result["data"]["authModelUsed"])){
+            $this->logger->notice('Payment requires otp validation...');
+            $this->authModelUsed = $result["data"]["authModelUsed"];
+            $this->flwRef = $result["data"]["flwRef"];
+            $this->txRef = $result["data"]["txRef"];
+       }
+        //passes the result to the suggestedAuth function which re-initiates the charge 
+        return $result;
      } 
      
     /**
@@ -823,37 +814,7 @@ class Rave {
         $result  = $this->cURL($this->options);
         return $result;
      }
-/**
-     * Handle suggested_auth which re-initiates the charge
-     * @param array $result This should be the result from cURL
-     * @return object
-     * */
-     function suggestedAuth($result){
-           //check the value of the returned data for the suggested_auth response
-        if(isset($result["data"]["suggested_auth"])){
-            if($result["data"]["suggested_auth"] === "PIN"){
-                $this->logger->notice('Validating Pin...');
-                $this->options["suggested_auth"] = "PIN";
-                $this->chargePayment($this->options);
-            }elseif($result["data"]["suggested_auth"] === "NOAUTH_INTERNATIONAL"){
-                $this->logger->notice('Validating Billing Address...');
-                $this->options["suggested_auth"] = "NOAUTH_INTERNATIONAL";
 
-                //TODO: Update $this->options with the billing addres details
-                //$this->chargePayment($this->options) //uncomment this function when charging international cards
-            }
-        } else {
-            //When a response without the suggested auth is returned then a validation is required.
-            //Set the authModelUsed, flwRef,txRef that will be used in the validation
-            if(isset($result["data"]["authModelUsed"])){
-                 $this->logger->notice('Payment requires otp validation...');
-                 $this->authModelUsed = $result["data"]["authModelUsed"];
-                 $this->flwRef = $result["data"]["flwRef"];
-                 $this->txRef = $result["data"]["txRef"];
-            }
-            return $result;   
-        }
-     }
     /**
      * Handle canceled payments with this method
      * @param string $referenceNumber This should be the reference number of the transaction that was canceled
