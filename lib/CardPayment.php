@@ -115,9 +115,9 @@ class Card {
              ***/
             
             //validate the charge
-            //$payment->validateTransaction($otp)//Uncomment this line if you need it
+           // $payment->validateTransaction($otp);//Uncomment this line if you need it
              //verify the charge
-            //$payment->verifyTransaction($txRef)//Uncomment this line if you need it
+           // $payment->verifyTransaction($txRef);//Uncomment this line if you need it
 
         }
     }

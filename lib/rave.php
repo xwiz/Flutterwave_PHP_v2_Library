@@ -638,18 +638,35 @@ class Rave {
     }
 
      /**
-     * makes a call to the api 
+     * makes a post call to the api 
      * @param array
      * @return object
      * */
 
-    function cURL($data){
+    function postURL($data){
         // make request to endpoint using unirest.
         $headers = array('Content-Type' => 'application/json');
         $body = Body::json($data);
         $url = $this->baseUrl.'/'.$this->end_point;
 
         $response = Request::post($url, $headers, $body);
+        return $response->raw_body;    // Unparsed body
+     }
+
+     
+     /**
+     * makes a get call to the api 
+     * @param array
+     * @return object
+     * */
+
+     function getURL($url){
+        // make request to endpoint using unirest.
+        $headers = array('Content-Type' => 'application/json');
+        //$body = Body::json($data);
+        $path = $this->baseUrl.'/'.$this->end_point;
+
+        $response = Request::get($path."/".$url, $headers);
         return $response->raw_body;    // Unparsed body
      }
      /**
@@ -664,7 +681,7 @@ class Rave {
             'txref' => $txRef,
             'SECKEY' => $this->secretKey
             );
-            $result  = $this->cURL($this->post_data);
+            $result  = $this->postURL($this->post_data);
             $result = json_decode($result,true);
         $this->handler->onSuccessful($result);
       
@@ -685,7 +702,7 @@ class Rave {
                     'PBFPubKey' => $this->publicKey,
                     'transaction_reference' => $this->flwRef,
                     'otp' => $otp);
-                $result  = $this->cURL($this->post_data);
+                $result  = $this->postURL($this->post_data);
                 return $result;
 
             }elseif($this->authModelUsed === "VBVSECURECODE"){
@@ -703,9 +720,10 @@ class Rave {
      *  @return object
      * */
 
-    function bvn($array){
+    function bvn($bvn){
         $this->logger->notice('Validating bvn...');
-        return $this->cURL($array);
+        $url = $bvn."?seckey=".$this->secretKey;
+        return $this->getURL($url);
      } 
 
       /**
@@ -716,7 +734,7 @@ class Rave {
 
     function payPlan($array){
         $this->logger->notice('Creating Payment Plan...');
-        return $this->cURL($array);
+        return $this->postURL($array);
      } 
 
        /**
@@ -727,7 +745,7 @@ class Rave {
 
     function beneficiary($array){
         $this->logger->notice('Creating beneficiaries ...');
-        return $this->cURL($array);
+        return $this->postURL($array);
      }
 
      /**
@@ -738,7 +756,7 @@ class Rave {
 
      function transferSingle($array){
         $this->logger->notice('Processing transfer...');
-         return $this->cURL($array);
+         return $this->postURL($array);
          
      }
 
@@ -751,7 +769,7 @@ class Rave {
 
     function transferBulk($array){
         $this->logger->notice('Processing bulk transfer...');
-         return $this->cURL($array);
+         return $this->postURL($array);
          
      }
 
@@ -763,7 +781,7 @@ class Rave {
 
     function refund($array){
         $this->logger->notice('Initiating a refund...');
-         return $this->cURL($array);
+         return $this->postURL($array);
          
      }
 
@@ -786,7 +804,7 @@ class Rave {
             'client' => $this->integrityHash,
             'alg' => '3DES-24');
 
-        $result  = $this->cURL($this->post_data);
+        $result  = $this->postURL($this->post_data);
         
         $this->logger->notice('Payment requires validation..'); 
         // the result returned requires validation
@@ -810,8 +828,8 @@ class Rave {
      function subaccount($array){
         $this->options = $array;
         $this->logger->notice('Creating Sub account...');
-        //pass $this->options to the cURL function to call the api
-        $result  = $this->cURL($this->options);
+        //pass $this->options to the postURL function to call the api
+        $result  = $this->postURL($this->options);
         return $result;
      }
 
