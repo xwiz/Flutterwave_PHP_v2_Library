@@ -666,7 +666,7 @@ class Rave {
         //$body = Body::json($data);
         $path = $this->baseUrl.'/'.$this->end_point;
 
-        $response = Request::get($path."/".$url, $headers);
+        $response = Request::get($path.$url, $headers);
         return $response->raw_body;    // Unparsed body
      }
      /**
@@ -716,13 +716,36 @@ class Rave {
     }
      /**
      * Validating your bvn
-     *  @param array
+     *  @param string
      *  @return object
      * */
 
     function bvn($bvn){
         $this->logger->notice('Validating bvn...');
-        $url = $bvn."?seckey=".$this->secretKey;
+        $url = "/".$bvn."?seckey=".$this->secretKey;
+        return $this->getURL($url);
+     } 
+
+     /**
+     * Get all Subscription
+     *  @return object
+     * */
+
+    function getAllSubscription(){
+        $this->logger->notice('Getting all Subscription...');
+        $url = "?seckey=".$this->secretKey;
+        return $this->getURL($url);
+     } 
+
+        /**
+     * Get all Subscription
+     * @param $id,$email
+     *  @return object
+     * */
+
+    function fetchASubscription($id, $email){
+        $this->logger->notice('Fetching a Subscription...');
+        $url = "?seckey=".$this->secretKey;
         return $this->getURL($url);
      } 
 
