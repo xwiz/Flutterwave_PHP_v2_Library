@@ -175,6 +175,175 @@ if($postData['amount']){
 }
 ```
 
+# Support Direct Charges
+
+## Account Charge Sample implementation
+
+The following implementation shows how to initiate a direct bank charge
+```php
+require("Flutterwave-Rave-PHP-SDK/lib/AccountPayment.php");
+use Flutterwave\Account;
+
+    $array = array(
+        "PBFPubKey" =>"****YOUR**PUBLIC**KEY****",
+        "accountbank"=> "044",// get the bank code from the bank list endpoint.
+        "accountnumber" => "0690000031",
+        "currency" => "NGN",
+        "payment_type" => "account",
+        "country" => "NG",
+        "amount" => "10",
+        "email" => "eze@gmail.com",
+       // passcode => "09101989",//customer Date of birth this is required for Zenith bank account payment.
+        "bvn" => "12345678901",
+        "phonenumber" => "0902620185",
+        "firstname" => "temi",
+        "lastname" => "desola",
+        "IP" => "355426087298442",
+        "txRef" => "MC-".time(), // merchant unique reference
+        "device_fingerprint" => "69e6b7f0b72037aa8428b70fbe03986c"
+
+    );
+$account = new Account("****YOUR**PUBLIC**KEY****","****YOUR**SECRET**KEY****","staging");
+$result = $account->accountCharge($array);
+print_r($result);
+```
+## Card Charge Sample implementation
+
+The following implementation shows how to initiate a direct card charge
+```php
+require("Flutterwave-Rave-PHP-SDK/lib/CardPayment.php");
+use Flutterwave\Card;
+    $array = array(
+        "PBFPubKey" => "****YOUR**PUBLIC**KEY****",
+        "cardno" =>"5438898014560229",
+        "cvv" => "890",
+        "expirymonth"=> "09",
+        "expiryyear"=> "19",
+        "currency"=> "NGN",
+        "country"=> "NG",
+        "amount"=> "2000",
+        "pin"=>"3310",
+         "payment_plan"=> "980",  
+        "email"=> "eze@gmail.com",
+        "phonenumber"=> "0902620185",
+        "firstname"=> "temi",
+        "lastname"=> "desola",
+        "IP"=> "355426087298442",
+        "txRef"=>"MC-".time(),// your unique merchant reference
+        "meta"=>["metaname"=> "flightID", "metavalue"=>"123949494DC"],
+        "redirect_url"=>"https://rave-webhook.herokuapp.com/receivepayment",
+        "device_fingerprint"=> "69e6b7f0b72037aa8428b70fbe03986c"
+    );
+$card = new Card("****YOUR**PUBLIC**KEY****","****YOUR**SECRET**KEY****","staging");
+$result = $card->cardCharge($array);
+print_r($result);
+```
+## BVN Verification Sample implementation
+
+The following implementation shows how to verify a Bank Verification Number
+```php
+require("Flutterwave-Rave-PHP-SDK/lib/Bvn.php");
+use Flutterwave\Bvn;
+$bvn = new Bvn("****YOUR**PUBLIC**KEY****","****YOUR**SECRET**KEY****","staging");
+$result = $bvn->verifyBVN("123456789");
+print_r($result);
+```
+
+## Create a Payment Plan Sample implementation
+
+The following implementation shows how to create a payment plan on the rave dashboard
+```php
+require("Flutterwave-Rave-PHP-SDK/lib/PaymentPlan.php");
+use Flutterwave\PaymentPlan;
+
+$array = array(
+    "amount" => "2000",
+     "name"=> "The Premium Plan",
+     "interval"=> "monthly",
+     "duration"=> "12",
+     "seckey" => "****YOUR**SECRET**KEY****"
+);
+
+$plan = new PaymentPlan("****YOUR**PUBLIC**KEY****","****YOUR**SECRET**KEY****","staging");
+$result = $plan->createPlan($array);
+print_r($result);
+```
+
+## Create a Subaccount Sample implementation
+
+The following implementation shows how to create a subaccount on the rave dashboard
+```php
+require("Flutterwave-Rave-PHP-SDK/lib/Subaccount.php");
+use Flutterwave\Subaccount;
+
+$array = array(
+        "account_bank"=>"044",
+        "account_number"=> "0690000030",
+        "business_name"=> "JK Services",
+        "business_email"=> "jke@services.com",
+        "business_contact"=> "Seun Alade",
+        "business_contact_mobile"=> "090890382",
+        "business_mobile"=> "09087930450",
+        "meta" => ["metaname"=> "MarketplaceID", "metavalue"=>"ggs-920900"],
+        "seckey"=> "****YOUR**SECRET**KEY****"
+);
+
+$subaccount = new Subaccount("****YOUR**PUBLIC**KEY****","****YOUR**SECRET**KEY****","staging");
+$result = $subaccount->subaccount($array);
+print_r($result);
+```
+## Create Transfer Recipient Sample implementation
+
+The following implementation shows how to create a transfer recipient on the rave dashboard
+```php
+require("Flutterwave-Rave-PHP-SDK/lib/Recipient.php");
+use Flutterwave\Recipient;
+
+$array = array(
+    "account_number"=>"0690000030",
+	"account_bank"=>"044",
+	"seckey"=>"****YOUR**SECRET**KEY****"
+);
+
+$recipient = new Recipient("****YOUR**PUBLIC**KEY****","****YOUR**SECRET**KEY****","staging");
+$result = $recipient->recipient($array);
+print_r($result);
+```
+
+## Create Refund Sample implementation
+
+The following implementation shows how to initiate a refund
+```php
+require("Flutterwave-Rave-PHP-SDK/lib/Refund.php");
+use Flutterwave\Refund;
+
+$array = array(
+    "ref"=>"txRef",//pass a transaction reference to initiate refund
+	"seckey"=>"****YOUR**SECRET**KEY****"
+);
+
+$refund = new Refund("****YOUR**PUBLIC**KEY****","****YOUR**SECRET**KEY****","staging");
+$result = $refund->refund($array);
+print_r($result);
+```
+
+## Subscriptions Sample implementation
+
+The following implementation shows how to activata a subscription, fetch a subscription, get all subscription
+```php
+require("Flutterwave-Rave-PHP-SDK/lib/Subscription.php");
+use Flutterwave\Subscription;
+
+$email = "eze@gmail.com";//email address of subscriber
+$id = 1112 //Id of subscription plan
+
+$subscription = new Subscription("****YOUR**PUBLIC**KEY****","****YOUR**SECRET**KEY****","staging");
+
+$resultFetch = $subscription->fetchASubscription($email);
+$resultGet = $subscription->getAllSubscription();
+$resultActivate = $subscription->activateSubscription($id);
+print_r($result);
+```
 You can also find the class documentation in the docs folder. There you will find documentation for the `Rave` class and the `EventHandlerInterface`.
 
 Enjoy... :v:
@@ -182,5 +351,4 @@ Enjoy... :v:
 ## ToDo
 
 - Write Unit Test
-- Support Direct Charges
 - Support Tokenized payment
