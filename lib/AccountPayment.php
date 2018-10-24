@@ -77,15 +77,28 @@ class accountEventHandler implements EventHandlerInterface{
 }
 
 
-class Account{
-    function accountCharge($publicKey, $secretKey, $env, $array){
-        $payment = new Rave($publicKey, $secretKey, $env);
+class Account {
+    function __constructor($publicKey, $secretKey, $env){
+        $this->payment = new Rave($publicKey, $secretKey, $env);
+    }
+    function accountCharge($array){
             //set the payment handler 
-            $payment->eventHandler(new accountEventHandler)
+            $this->payment->eventHandler(new accountEventHandler)
             //set the endpoint for the api call
-            ->setEndPoint("flwv3-pug/getpaidx/api/v2/hosted/pay");
+            ->setEndPoint("flwv3-pug/getpaidx/api/charge");
             //returns the value from the results
-            return $payment->chargePayment($array);
+            //you can choose to store the returned value in a variable and validate within this function
+            return $this->payment->chargePayment($array);
+            /**you will need to validate and verify the charge
+             * Validating the charge will require an otp
+             * After validation then verify the charge with the txRef
+             * You can write out your function to execute when the verification is successful in the onSuccessful function
+             ***/
+
+            //validate the charge
+            //$payment->validateTransaction($otp)//Uncomment this line if you need it
+             //verify the charge
+            //$payment->verifyTransaction($txRef)//Uncomment this line if you need it
         }
     }
 ?>

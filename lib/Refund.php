@@ -72,15 +72,17 @@ class refundEventHandler implements EventHandlerInterface{
 }
 
 
-class Refund{
-    function refund($publicKey, $secretKey, $env, $array){
-        $payment = new Rave($publicKey, $secretKey, $env);
+class Refund {
+    function __constructor($publicKey, $secretKey, $env){
+        $this->refund = new Rave($publicKey, $secretKey, $env);
+    }
+    function refund($array){
             //set the payment handler 
-            $payment->eventHandler(new refundEventHandler)
+            $this->refund->eventHandler(new refundEventHandler)
             //set the endpoint for the api call
-            ->setEndPoint("flwv3-pug/getpaidx/api/v2/hosted/pay");
+            ->setEndPoint("gpx/merchant/transactions/refund");
             //returns the value from the results
-            return $payment->chargePayment($array);
+            return $this->refund->refund($array);
         }
     }
 ?>

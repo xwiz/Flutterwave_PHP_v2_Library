@@ -634,7 +634,7 @@ class Rave {
          //set the data to transactionData
          $this->transactionData = $options;
          //encode the data and the 
-         $this->integrityHash = $this->encrypt3Des( $this->transactionData,  $this->key);
+        return $this->encrypt3Des( $this->transactionData,  $this->key);
     }
 
      /**
@@ -671,24 +671,17 @@ class Rave {
      *  @param string
      *  @return object
      * */
-    function verifyTransaction(){
-        if(isset($this->txRef)){
-            if($this->authModelUsed === "PIN"){  
-                $this->logger->notice('Verifying transaction...');
-                $this->end_point = "flwv3-pug/getpaidx/api/v2/verify";
-                $this->post_data =  array( 
-                    'txref' => $this->txRef,
-                    'SECKEY' => $this->secretKey
-                    );
-                 $result  = $this->cURL($this->post_data);
-                 $result = json_decode($result,true);
-                $this->handler->onSuccessful($result);
-
-            }elseif($this->authModelUsed === "VBVSECURECODE"){
-                $this->logger->notice('Verifying transaction...');
-            }
-            
-        }
+    function verifyTransaction($txref){
+        $this->logger->notice('Verifying transaction...');
+        $this->setEndPoint("flwv3-pug/getpaidx/api/v2/verify");
+        $this->post_data =  array( 
+            'txref' => $txRef,
+            'SECKEY' => $this->secretKey
+            );
+            $result  = $this->cURL($this->post_data);
+            $result = json_decode($result,true);
+        $this->handler->onSuccessful($result);
+      
     }
 
 
@@ -700,34 +693,56 @@ class Rave {
     function validateTransaction($otp){
         if(isset($this->authModelUsed)){
             if($this->authModelUsed === "PIN"){
-                $this->logger->notice('Validation otp...');
-                $this->end_point = "flwv3-pug/getpaidx/api/validatecharge";
+                $this->logger->notice('Validating otp...');
+                $this->setEndPoint("flwv3-pug/getpaidx/api/validatecharge");
                 $this->post_data = array(
                     'PBFPubKey' => $this->publicKey,
                     'transaction_reference' => $this->flwRef,
                     'otp' => $otp);
-                 $result  = $this->cURL($this->post_data);
-                 $result = json_decode($result, true);
-                 print_r($result);
-                 $this->verifyTransaction();
+                $result  = $this->cURL($this->post_data);
+                return $result;
 
             }elseif($this->authModelUsed === "VBVSECURECODE"){
                 $this->logger->notice('VBVSECURECODE...');
               //Validation for foreign cards
+            }else{
+                $this->logger->error('You have not charged this transaction...');
             }
             
         }
     }
      /**
-     * St
+     * Validating your bvn
      *  @param array
      *  @return object
      * */
 
     function bvn($array){
+        $this->logger->notice('Validating bvn...');
         return $this->cURL($array);
      } 
 
+      /**
+     * Creating a payment plan
+     *  @param array
+     *  @return object
+     * */
+
+    function payPlan($array){
+        $this->logger->notice('Creating Payment Plan...');
+        return $this->cURL($array);
+     } 
+
+       /**
+     * Creating a beneficiaries
+     *  @param array
+     *  @return object
+     * */
+
+    function beneficiary($array){
+        $this->logger->notice('Creating beneficiaries ...');
+        return $this->cURL($array);
+     }
 
      /**
      * transfer payment api 
@@ -740,6 +755,32 @@ class Rave {
          return $this->cURL($array);
          
      }
+
+
+     /**
+     * bulk transfer payment api 
+     *  @param array
+     *  @return object
+     * */
+
+    function transferBulk($array){
+        $this->logger->notice('Processing bulk transfer...');
+         return $this->cURL($array);
+         
+     }
+
+      /**
+     * Refund payment api 
+     *  @param array
+     *  @return object
+     * */
+
+    function refund($array){
+        $this->logger->notice('Initiating a refund...');
+         return $this->cURL($array);
+         
+     }
+
     /**
      * Generates the final json to be used in configuring the payment call to the rave payment gateway api
      *  @param array
@@ -752,7 +793,7 @@ class Rave {
         
         $this->logger->notice('Checking payment details..');
         //encrypt the required options to pass to the server
-        $this->encryption($this->json_options);
+        $this->integrityHash = $this->encryption($this->json_options);
 
         $this->post_data = array(
             'PBFPubKey' => $this->publicKey,
@@ -762,10 +803,12 @@ class Rave {
         $result  = $this->cURL($this->post_data);
         if(isset($result)){
             $this->logger->notice('Payment requires validation..'); 
+            // the result returned requires validation
+            $result = json_decode($result, true);
+            //passes the result to the suggestedAuth function which re-initiates the charge 
+            $this->suggestedAuth($result);
         }
-        $result = json_decode($result, true);
-
-       $this->suggestedAuth($result);
+       
      } 
      
     /**
@@ -776,8 +819,8 @@ class Rave {
      function subaccount($array){
         $this->options = $array;
         $this->logger->notice('Creating Sub account...');
+        //pass $this->options to the cURL function to call the api
         $result  = $this->cURL($this->options);
-        $result = json_decode($result, true);
         return $result;
      }
 /**
@@ -796,17 +839,17 @@ class Rave {
                 $this->logger->notice('Validating Billing Address...');
                 $this->options["suggested_auth"] = "NOAUTH_INTERNATIONAL";
 
-                //Update $this->options with the billing addres details
+                //TODO: Update $this->options with the billing addres details
                 //$this->chargePayment($this->options) //uncomment this function when charging international cards
             }
         } else {
             //When a response without the suggested auth is returned then a validation is required.
             //Set the authModelUsed, flwRef,txRef that will be used in the validation
             if(isset($result["data"]["authModelUsed"])){
-                $this->logger->notice('Payment requires otp validation...');
-                $this->authModelUsed = $result["data"]["authModelUsed"];
-                $this->flwRef = $result["data"]["flwRef"];
-                $this->txRef = $result["data"]["txRef"];
+                 $this->logger->notice('Payment requires otp validation...');
+                 $this->authModelUsed = $result["data"]["authModelUsed"];
+                 $this->flwRef = $result["data"]["flwRef"];
+                 $this->txRef = $result["data"]["txRef"];
             }
             return $result;   
         }

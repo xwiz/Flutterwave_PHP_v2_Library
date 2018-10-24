@@ -73,14 +73,25 @@ class subscriptionEventHandler implements EventHandlerInterface{
 
 
 class Subscription{
-    function subscription($publicKey, $secretKey, $env, $array){
-        $payment = new Rave($publicKey, $secretKey, $env);
+    function __constructor($publicKey, $secretKey, $env){
+        $this->subscription = new Rave($publicKey, $secretKey, $env);
+    }
+    function getSubscription($array){
             //set the payment handler 
-            $payment->eventHandler(new subscriptionEventHandler)
+            $this->subscription->eventHandler(new subscriptionEventHandler)
             //set the endpoint for the api call
-            ->setEndPoint("flwv3-pug/getpaidx/api/v2/hosted/pay");
+            ->setEndPoint("/v2/gpx/subscriptions/query");
             //returns the value from the results
-            return $payment->chargePayment($array);
+            return $this->subscription->getSubscription($array);
+        }
+
+    function fetchSubscription($array){
+            //set the payment handler 
+            $this->subscription->eventHandler(new subscriptionEventHandler)
+            //set the endpoint for the api call
+            ->setEndPoint("/v2/gpx/subscriptions/query");
+            //returns the value from the results
+            return $this->subscription->fetchSubscription($array);
         }
     }
 ?>

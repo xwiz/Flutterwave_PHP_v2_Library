@@ -72,15 +72,15 @@ class transactionVerificationEventHandler implements EventHandlerInterface{
 }
 
 
-class TransactionVerification{
-    function transactionVerify($publicKey, $secretKey, $env, $array){
-        $payment = new Rave($publicKey, $secretKey, $env);
+class TransactionVerification {
+    function __constructor($publicKey, $secretKey, $env){
+        $this->validate = new Rave($publicKey, $secretKey, $env);
+    }
+    function transactionVerify($array){
             //set the payment handler 
-            $payment->eventHandler(new transactionVerificationEventHandler)
-            //set the endpoint for the api call
-            ->setEndPoint("flwv3-pug/getpaidx/api/v2/hosted/pay");
+            $this->validate->eventHandler(new transactionVerificationEventHandler);
             //returns the value from the results
-            return $payment->chargePayment($array);
+            return $this->validate->verifyTransaction($array);
         }
     }
 ?>

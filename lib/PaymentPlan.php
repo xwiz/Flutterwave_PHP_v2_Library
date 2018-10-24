@@ -73,14 +73,16 @@ class paymentPlanEventHandler implements EventHandlerInterface{
 
 
 class PaymentPlan{
-    function paymentPlan($publicKey, $secretKey, $env, $array){
-        $payment = new Rave($publicKey, $secretKey, $env);
+    function __constructor($publicKey, $secretKey, $env){
+        $this->plan = new Rave($publicKey, $secretKey, $env);
+    }
+    function paymentPlan($array){
             //set the payment handler 
-            $payment->eventHandler(new paymentPlanEventHandler)
+            $this->plan->eventHandler(new paymentPlanEventHandler)
             //set the endpoint for the api call
-            ->setEndPoint("flwv3-pug/getpaidx/api/v2/hosted/pay");
+            ->setEndPoint("v2/gpx/paymentplans/create");
             //returns the value from the results
-            return $payment->chargePayment($array);
+            return $this->plan->payPlan($array);
         }
     }
 ?>

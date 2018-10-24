@@ -72,15 +72,17 @@ class recipientEventHandler implements EventHandlerInterface{
 }
 
 
-class Recipient{
-    function recipient($publicKey, $secretKey, $env, $array){
-        $payment = new Rave($publicKey, $secretKey, $env);
+class Recipient {
+    function __constructor(){
+        $this->recipient = new Rave($publicKey, $secretKey, $env);
+    }
+    function recipient($array){
             //set the payment handler 
-            $payment->eventHandler(new recipientEventHandler)
+            $this->recipient->eventHandler(new recipientEventHandler)
             //set the endpoint for the api call
-            ->setEndPoint("flwv3-pug/getpaidx/api/v2/hosted/pay");
+            ->setEndPoint("v2/gpx/transfers/beneficiaries/create");
             //returns the value from the results
-            return $payment->chargePayment($array);
+            return $this->recipient->beneficiary($array);
         }
     }
 ?>

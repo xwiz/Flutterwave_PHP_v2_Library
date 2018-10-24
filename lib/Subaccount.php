@@ -73,13 +73,13 @@ class subaccountEventHandler implements EventHandlerInterface{
 
 class Subaccount {
     function subaccount($publicKey, $secretKey, $env, $array){
-        $payment = new Rave($publicKey, $secretKey, $env);
+        $subaccount = new Rave($publicKey, $secretKey, $env);
             //set the payment handler 
-            $payment->eventHandler(new subaccountEventHandler)
+            $subaccount->eventHandler(new subaccountEventHandler)
             //set the endpoint for the api call
             ->setEndPoint("flwv3-pug/getpaidx/api/v2/hosted/pay");
             //returns the value from the results
-            return $payment->pay($array);
+            return $subaccount->pay($array);
         }
 }
 
