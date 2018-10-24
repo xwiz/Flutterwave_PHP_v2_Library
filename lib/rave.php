@@ -743,10 +743,23 @@ class Rave {
      *  @return object
      * */
 
-    function fetchASubscription($id, $email){
+    function fetchASubscription($email){
         $this->logger->notice('Fetching a Subscription...');
-        $url = "?seckey=".$this->secretKey;
+        $url = "?seckey=".$this->secretKey."&".$email;
         return $this->getURL($url);
+     } 
+
+      /**
+     * activating  a subscription
+     *  @return object
+     * */
+
+    function activateSubscription(){
+        $this->logger->notice('Activating Subscription...');
+        $data = array(
+            "seckey"=>$this->secretKey
+        );
+        return $this->postURL($data);
      } 
 
       /**

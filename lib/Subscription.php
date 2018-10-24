@@ -77,6 +77,17 @@ class Subscription{
     function __construct($publicKey, $secretKey, $env){
         $this->subscription = new Rave($publicKey, $secretKey, $env);
     }
+
+    function activateSubscription($id){
+        //set the payment handler 
+        $endPoint = 'v2/gpx/subscriptions/'.$id.'/activate';
+        $this->subscription->eventHandler(new subscriptionEventHandler)
+        //set the endpoint for the api call
+        ->setEndPoint($endPoint);
+        //returns the value from the results
+        return $this->subscription->activateSubscription();
+    }
+
     function getAllSubscription(){
             //set the payment handler 
             $this->subscription->eventHandler(new subscriptionEventHandler)
@@ -86,13 +97,13 @@ class Subscription{
             return $this->subscription->getAllSubscription();
         }
 
-    function fetchASubscription($array){
+    function fetchASubscription($email){
             //set the payment handler 
             $this->subscription->eventHandler(new subscriptionEventHandler)
             //set the endpoint for the api call
             ->setEndPoint("v2/gpx/subscriptions/query");
             //returns the value from the results
-            return $this->subscription->fetchSubscription($array);
+            return $this->subscription->fetchASubscription($email);
         }
     }
 ?>
