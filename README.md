@@ -223,7 +223,7 @@ use Flutterwave\Card;
         "country"=> "NG",
         "amount"=> "2000",
         "pin"=>"3310",
-         "payment_plan"=> "980",  
+        "payment_plan"=> "980", //use this parameter only when the payment is a subscription, specify the payment plan id
         "email"=> "eze@gmail.com",
         "phonenumber"=> "0902620185",
         "firstname"=> "temi",
@@ -339,9 +339,11 @@ $id = 1112 //Id of subscription plan
 
 $subscription = new Subscription("****YOUR**PUBLIC**KEY****","****YOUR**SECRET**KEY****","staging");
 
-$resultFetch = $subscription->fetchASubscription($email);
-$resultGet = $subscription->getAllSubscription();
-$resultActivate = $subscription->activateSubscription($id);
+$resultFetch = $subscription->fetchASubscription($email);//fetches a subscription
+$resultGet = $subscription->getAllSubscription();//gets all existing subscription
+$resultActivate = $subscription->activateSubscription($id);// activates a subscription plan
+
+//returns the result 
 print_r($result);
 ```
 You can also find the class documentation in the docs folder. There you will find documentation for the `Rave` class and the `EventHandlerInterface`.
