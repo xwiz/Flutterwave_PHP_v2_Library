@@ -77,13 +77,13 @@ class PaymentPlan{
     function __construct($publicKey, $secretKey, $env){
         $this->plan = new Rave($publicKey, $secretKey, $env);
     }
-    function paymentPlan($array){
+    function createPlan($array){
             //set the payment handler 
             $this->plan->eventHandler(new paymentPlanEventHandler)
             //set the endpoint for the api call
             ->setEndPoint("v2/gpx/paymentplans/create");
             //returns the value from the results
-            return $this->plan->payPlan($array);
+            return $this->plan->createPlan($array);
         }
     }
 ?>

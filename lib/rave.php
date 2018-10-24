@@ -732,7 +732,7 @@ class Rave {
      *  @return object
      * */
 
-    function payPlan($array){
+    function createPlan($array){
         $this->logger->notice('Creating Payment Plan...');
         return $this->postURL($array);
      } 
