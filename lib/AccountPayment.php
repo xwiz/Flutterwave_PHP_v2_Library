@@ -78,7 +78,9 @@ class accountEventHandler implements EventHandlerInterface{
 
 
 class Account {
-    function __constructor($publicKey, $secretKey, $env){
+    protected $payment;
+
+    function __construct($publicKey, $secretKey, $env){
         $this->payment = new Rave($publicKey, $secretKey, $env);
     }
     function accountCharge($array){

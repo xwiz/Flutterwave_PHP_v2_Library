@@ -72,7 +72,8 @@ class bvnEventHandler implements EventHandlerInterface{
 }
 
 class Bvn {
-    function __constructor(){
+    protected $bvn;
+    function __construct(){
         $this->bvn = new Rave($publicKey, $secretKey, $env);
     }
     function verifyBVN($array){

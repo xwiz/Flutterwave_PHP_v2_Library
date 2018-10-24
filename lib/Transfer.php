@@ -73,25 +73,27 @@ class transferEventHandler implements EventHandlerInterface{
 }
 
 class Transfer {
+    protected $transfer;
+    function __construct($publicKey, $secretKey, $env){
+        $this->transfer = new Rave($publicKey, $secretKey, $env);
+    }
     //initiating a single transfer
-    function singleTransfer($publicKey, $secretKey, $env, $array){
-        $transfer = new Rave($publicKey, $secretKey, $env);
+    function singleTransfer($array){
             //set the payment handler 
-            $transfer->eventHandler(new transferEventHandler)
+            $this->transfer->eventHandler(new transferEventHandler)
             //set the endpoint for the api call
             ->setEndPoint("v2/gpx/transfers/create");
             //returns the value from the results
-            return $transfer->transferSingle($array);
+            return $this->transfer->transferSingle($array);
         }
      //initiating a bulk transfer
-    function bulkTransfer($publicKey, $secretKey, $env, $array){
-        $bulkTransfer = new Rave($publicKey, $secretKey, $env);
+    function bulkTransfer($array){
             //set the payment handler 
-            $bulkTransfer->eventHandler(new transferEventHandler)
+            $this->transfer->eventHandler(new transferEventHandler)
             //set the endpoint for the api call
             ->setEndPoint("v2/gpx/transfers/create_bulk");
             //returns the value from the results
-            return $bulkTransfer->transferBulk($array);
+            return $this->ransfer->transferBulk($array);
         }
     }
 

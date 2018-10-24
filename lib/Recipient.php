@@ -73,7 +73,8 @@ class recipientEventHandler implements EventHandlerInterface{
 
 
 class Recipient {
-    function __constructor(){
+    protected $recipient;
+    function __construct(){
         $this->recipient = new Rave($publicKey, $secretKey, $env);
     }
     function recipient($array){

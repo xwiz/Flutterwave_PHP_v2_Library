@@ -73,7 +73,8 @@ class transactionVerificationEventHandler implements EventHandlerInterface{
 
 
 class TransactionVerification {
-    function __constructor($publicKey, $secretKey, $env){
+    protected $validate;
+    function __construct($publicKey, $secretKey, $env){
         $this->validate = new Rave($publicKey, $secretKey, $env);
     }
     function transactionVerify($array){

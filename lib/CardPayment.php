@@ -80,10 +80,11 @@ class cardEventHandler implements EventHandlerInterface{
 }
 
 class Card {
-    function __constructor($publicKey, $secretKey, $env){
+    protected $payment;
+    function __construct($publicKey, $secretKey, $env){
         $this->payment = new Rave($publicKey, $secretKey, $env);
     }
-    function cardPayment($array){
+    function cardCharge($array){
             //set the payment handler 
             $this->payment->eventHandler(new cardEventHandler)
             //set the endpoint for the api call

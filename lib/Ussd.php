@@ -72,14 +72,17 @@ class ussdEventHandler implements EventHandlerInterface{
 }
 
 class Ussd {
-    function ussd($publicKey, $secretKey, $env, $array){
+    protected $ussd;
+    function __construct($publicKey, $secretKey, $env){
         $ussd = new Rave($publicKey, $secretKey, $env);
+    }
+    function ussd($array){
             //set the payment handler 
-            $ussd->eventHandler(new ussdEventHandler)
+            $this->ussd->eventHandler(new ussdEventHandler)
             //set the endpoint for the api call
             ->setEndPoint("flwv3-pug/getpaidx/api/v2/hosted/pay");
             //returns the value from the results
-            return $ussd->pay($array);
+            return $this->ussd->pay($array);
         }
 }
 ?>

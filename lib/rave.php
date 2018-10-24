@@ -801,13 +801,13 @@ class Rave {
             'alg' => '3DES-24');
 
         $result  = $this->cURL($this->post_data);
-        if(isset($result)){
-            $this->logger->notice('Payment requires validation..'); 
-            // the result returned requires validation
-            $result = json_decode($result, true);
-            //passes the result to the suggestedAuth function which re-initiates the charge 
-            $this->suggestedAuth($result);
-        }
+        
+        $this->logger->notice('Payment requires validation..'); 
+        // the result returned requires validation
+        $result = json_decode($result, true);
+        //passes the result to the suggestedAuth function which re-initiates the charge 
+        return $this->suggestedAuth($result);
+
        
      } 
      
