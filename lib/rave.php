@@ -6,11 +6,15 @@ namespace Flutterwave;
 
 require __DIR__.'/../vendor/autoload.php'; // Uncomment this autoloader if you need it
 
+
 use Monolog\Logger;
 use Monolog\Handler\RotatingFileHandler;
 use Unirest\Request;
 use Unirest\Request\Body;
+use Dotenv;
 
+$dotenv = new Dotenv\Dotenv(__DIR__.'/../');
+$dotenv->load();
 /**
  * Flutterwave's Rave payment gateway PHP SDK
  * @author Olufemi Olanipekun <iolufemi@ymail.com>
