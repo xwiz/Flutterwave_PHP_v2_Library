@@ -177,6 +177,15 @@ if($postData['amount']){
 
 # Support Direct Charges
 
+Save your PUBLIC_KEY, SECRET_KEY, ENV in the .env file
+```env
+
+PUBLIC_KEY = "****YOUR**PUBLIC**KEY****"
+SECRET_KEY = "****YOUR**SECRET**KEY****"
+ENV = "staging or live"
+
+```
+
 ## Account Charge Sample implementation
 
 The following implementation shows how to initiate a direct bank charge
@@ -203,7 +212,7 @@ use Flutterwave\Account;
         "device_fingerprint" => "69e6b7f0b72037aa8428b70fbe03986c"
 
     );
-$account = new Account("****YOUR**PUBLIC**KEY****","****YOUR**SECRET**KEY****","staging");
+$account = new Account();
 $result = $account->accountCharge($array);
 print_r($result);
 ```
@@ -234,7 +243,7 @@ use Flutterwave\Card;
         "redirect_url"=>"https://rave-webhook.herokuapp.com/receivepayment",
         "device_fingerprint"=> "69e6b7f0b72037aa8428b70fbe03986c"
     );
-$card = new Card("****YOUR**PUBLIC**KEY****","****YOUR**SECRET**KEY****","staging");
+$card = new Card();
 $result = $card->cardCharge($array);
 print_r($result);
 ```
@@ -244,7 +253,7 @@ The following implementation shows how to verify a Bank Verification Number
 ```php
 require("Flutterwave-Rave-PHP-SDK/lib/Bvn.php");
 use Flutterwave\Bvn;
-$bvn = new Bvn("****YOUR**PUBLIC**KEY****","****YOUR**SECRET**KEY****","staging");
+$bvn = new Bvn();
 $result = $bvn->verifyBVN("123456789");
 print_r($result);
 ```
@@ -264,7 +273,7 @@ $array = array(
      "seckey" => "****YOUR**SECRET**KEY****"
 );
 
-$plan = new PaymentPlan("****YOUR**PUBLIC**KEY****","****YOUR**SECRET**KEY****","staging");
+$plan = new PaymentPlan();
 $result = $plan->createPlan($array);
 print_r($result);
 ```
@@ -288,7 +297,7 @@ $array = array(
         "seckey"=> "****YOUR**SECRET**KEY****"
 );
 
-$subaccount = new Subaccount("****YOUR**PUBLIC**KEY****","****YOUR**SECRET**KEY****","staging");
+$subaccount = new Subaccount();
 $result = $subaccount->subaccount($array);
 print_r($result);
 ```
@@ -305,7 +314,7 @@ $array = array(
 	"seckey"=>"****YOUR**SECRET**KEY****"
 );
 
-$recipient = new Recipient("****YOUR**PUBLIC**KEY****","****YOUR**SECRET**KEY****","staging");
+$recipient = new Recipient();
 $result = $recipient->recipient($array);
 print_r($result);
 ```
@@ -322,7 +331,7 @@ $array = array(
 	"seckey"=>"****YOUR**SECRET**KEY****"
 );
 
-$refund = new Refund("****YOUR**PUBLIC**KEY****","****YOUR**SECRET**KEY****","staging");
+$refund = new Refund();
 $result = $refund->refund($array);
 print_r($result);
 ```
@@ -337,7 +346,7 @@ use Flutterwave\Subscription;
 $email = "eze@gmail.com";//email address of subscriber
 $id = 1112 //Id of subscription plan
 
-$subscription = new Subscription("****YOUR**PUBLIC**KEY****","****YOUR**SECRET**KEY****","staging");
+$subscription = new Subscription();
 
 $resultFetch = $subscription->fetchASubscription($email);//fetches a subscription
 $resultGet = $subscription->getAllSubscription();//gets all existing subscription
