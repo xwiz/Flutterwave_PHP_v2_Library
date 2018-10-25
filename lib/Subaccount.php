@@ -73,8 +73,8 @@ class subaccountEventHandler implements EventHandlerInterface{
 
 class Subaccount {
     protected $subaccount;
-    function __construct($publicKey, $secretKey, $env){
-        $this->subaccount = new Rave($publicKey, $secretKey, $env);
+    function __construct(){
+        $this->subaccount = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
     }
     function subaccount($array){
             //set the payment handler 

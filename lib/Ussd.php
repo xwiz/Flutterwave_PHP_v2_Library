@@ -73,8 +73,8 @@ class ussdEventHandler implements EventHandlerInterface{
 
 class Ussd {
     protected $ussd;
-    function __construct($publicKey, $secretKey, $env){
-        $ussd = new Rave($publicKey, $secretKey, $env);
+    function __construct(){
+        $ussd = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
     }
     function ussd($array){
             //set the payment handler 

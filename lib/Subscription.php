@@ -74,8 +74,8 @@ class subscriptionEventHandler implements EventHandlerInterface{
 
 class Subscription{
     protected $subscription;
-    function __construct($publicKey, $secretKey, $env){
-        $this->subscription = new Rave($publicKey, $secretKey, $env);
+    function __construct(){
+        $this->subscription = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
     }
 
     function activateSubscription($id){

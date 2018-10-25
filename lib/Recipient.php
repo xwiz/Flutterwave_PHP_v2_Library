@@ -74,8 +74,8 @@ class recipientEventHandler implements EventHandlerInterface{
 
 class Recipient {
     protected $recipient;
-    function __construct($publicKey, $secretKey, $env){
-        $this->recipient = new Rave($publicKey, $secretKey, $env);
+    function __construct(){
+        $this->recipient = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
     }
     function recipient($array){
             //set the payment handler 

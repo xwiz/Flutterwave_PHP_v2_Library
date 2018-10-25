@@ -74,8 +74,8 @@ class paymentPlanEventHandler implements EventHandlerInterface{
 
 class PaymentPlan{
     protected $plan;
-    function __construct($publicKey, $secretKey, $env){
-        $this->plan = new Rave($publicKey, $secretKey, $env);
+    function __construct(){
+        $this->plan = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
     }
     function createPlan($array){
             //set the payment handler 

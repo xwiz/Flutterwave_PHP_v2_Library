@@ -74,8 +74,8 @@ class refundEventHandler implements EventHandlerInterface{
 
 class Refund {
     protected $refund;
-    function __construct($publicKey, $secretKey, $env){
-        $this->refund = new Rave($publicKey, $secretKey, $env);
+    function __construct(){
+        $this->refund = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
     }
     function refund($array){
             //set the payment handler 

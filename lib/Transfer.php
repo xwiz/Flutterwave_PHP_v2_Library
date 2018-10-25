@@ -74,8 +74,8 @@ class transferEventHandler implements EventHandlerInterface{
 
 class Transfer {
     protected $transfer;
-    function __construct($publicKey, $secretKey, $env){
-        $this->transfer = new Rave($publicKey, $secretKey, $env);
+    function __construct(){
+        $this->transfer = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
     }
     //initiating a single transfer
     function singleTransfer($array){

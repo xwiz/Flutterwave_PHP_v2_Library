@@ -73,8 +73,8 @@ class bvnEventHandler implements EventHandlerInterface{
 
 class Bvn {
     protected $bvn;
-    function __construct($publicKey, $secretKey, $env){
-        $this->bvn = new Rave($publicKey, $secretKey, $env);
+    function __construct(){
+        $this->bvn = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
     }
     function verifyBVN($bvn){
             //set the payment handler 
