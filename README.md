@@ -223,7 +223,7 @@ use Flutterwave\Card;
         "country"=> "NG",
         "amount"=> "2000",
         "pin"=>"3310",
-        "payment_plan"=> "980", //use this parameter only when the payment is a subscription, specify the payment plan id
+        //"payment_plan"=> "980", //use this parameter only when the payment is a subscription, specify the payment plan id
         "email"=> "eze@gmail.com",
         "phonenumber"=> "0902620185",
         "firstname"=> "temi",
