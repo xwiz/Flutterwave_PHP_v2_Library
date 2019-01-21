@@ -8,13 +8,17 @@
         "vlucas/phpdotenv": "^2.5"
     },
     "require-dev": {
-        "phpunit/phpunit": "~5.3"
+        "phpunit/phpunit": "^5.3"
     },
     "license": "MIT",
     "authors": [
         {
             "name": "Olanipekun Femi",
             "email": "iolufemi@ymail.com"
+        },
+        {
+            "name": "Emereuwaonu Eze",
+            "email": "emereuwaonueze@gmail.com"
         }
     ]
 }

@@ -81,7 +81,7 @@ class Rave {
      * @param boolean $overrideRefWithPrefix Set this parameter to true to use your prefix as the transaction reference
      * @return object
      * */
-    function __construct($publicKey, $secretKey, $prefix = 'RV', $env = 'staging', $overrideRefWithPrefix = false){
+    function __construct($publicKey, $secretKey, $env = 'staging', $prefix = 'RV', $overrideRefWithPrefix = false){
         $this->publicKey = $publicKey;
         $this->secretKey = $secretKey;
         $this->env = $env;
@@ -247,6 +247,16 @@ class Rave {
         return $this;
     }
 
+
+     /**
+     * Sets the transaction authmodel
+     * @param string $authmodel 
+     * @return object
+     * */
+    function setAuthModel($authmodel){
+        $this->authModelUsed = $authmodel;
+        return $this;
+    }
     
     
     /**
@@ -652,7 +662,6 @@ class Rave {
         $headers = array('Content-Type' => 'application/json');
         $body = Body::json($data);
         $url = $this->baseUrl.'/'.$this->end_point;
-
         $response = Request::post($url, $headers, $body);
         return $response->raw_body;    // Unparsed body
      }
@@ -712,6 +721,7 @@ class Rave {
             }elseif($this->authModelUsed === "VBVSECURECODE"){
                 $this->logger->notice('VBVSECURECODE...');
               //Validation for foreign cards
+              return "VBVSECURECODE";
             }else{
                 $this->logger->error('You have not charged this transaction...');
             }

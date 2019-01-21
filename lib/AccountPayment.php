@@ -91,16 +91,23 @@ class Account {
             //returns the value from the results
             //you can choose to store the returned value in a variable and validate within this function
             return $this->payment->chargePayment($array);
-            /**you will need to validate and verify the charge
+           
+        }
+
+             /**you will need to validate and verify the charge
              * Validating the charge will require an otp
              * After validation then verify the charge with the txRef
              * You can write out your function to execute when the verification is successful in the onSuccessful function
-             ***/
+         ***/
 
+        function validateTransaction($otp){
             //validate the charge
-            //$payment->validateTransaction($otp)//Uncomment this line if you need it
-             //verify the charge
-            //$payment->verifyTransaction($txRef)//Uncomment this line if you need it
-        }
+          return $this->payment->validateTransaction($otp);//Uncomment this line if you need it
+       }
+       function verifyTransaction($txRef){
+           //verify the charge
+           return $this->payment->verifyTransaction($txRef);//Uncomment this line if you need it
+       }
+
     }
 ?>

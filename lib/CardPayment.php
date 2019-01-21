@@ -98,28 +98,36 @@ class Card {
                  if($result["data"]["suggested_auth"] === "PIN"){
                      //validates the pin on the request data
                      $array["suggested_auth"] = "PIN";
+                     $this->payment->setAuthModel("PIN");
                      return $this->payment->chargePayment($array);
-                 }elseif($result["data"]["suggested_auth"] === "NOAUTH_INTERNATIONAL"){
-                    $array["suggested_auth"] = "NOAUTH_INTERNATIONAL";
-     
-                     //TODO: Update $this->options with the billing addres details
-                     //$this->chargePayment($this->options) //uncomment this function when charging international cards
                  }
-             } 
-          
+             } else{
+                // $array["suggested_auth"] = "NOAUTH_INTERNATIONAL";
+                $this->payment->setAuthModel($result["data"]["authModelUsed"]);
+                return $result;
+ 
+                 //TODO: Update $this->options with the billing addres details
+                 //$this->chargePayment($this->options) //uncomment this function when charging international cards
+             }
+            
+        }
 
-            /**you will need to validate and verify the charge
+         /**you will need to validate and verify the charge
              * Validating the charge will require an otp
              * After validation then verify the charge with the txRef
              * You can write out your function to execute when the verification is successful in the onSuccessful function
-             ***/
-            
-            //validate the charge
-           // $payment->validateTransaction($otp);//Uncomment this line if you need it
-             //verify the charge
-           // $payment->verifyTransaction($txRef);//Uncomment this line if you need it
+         ***/
 
+        function validateTransaction($otp){
+             //validate the charge
+           return $this->payment->validateTransaction($otp);//Uncomment this line if you need it
         }
+        function verifyTransaction($txRef){
+            //verify the charge
+            return $this->payment->verifyTransaction($txRef);//Uncomment this line if you need it
+        }
+      
+
     }
 
 ?>
