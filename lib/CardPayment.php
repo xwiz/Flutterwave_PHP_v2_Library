@@ -92,24 +92,28 @@ class Card {
             //returns the value from the results
             //$result = $this->payment->chargePayment($array);
             $result = $this->payment->chargePayment($array);
-           
                 //check the value of the returned data for the suggested_auth response
              if(isset($result["data"]["suggested_auth"])){
                  if($result["data"]["suggested_auth"] === "PIN"){
                      //validates the pin on the request data
-                     $array["suggested_auth"] = "PIN";
                      $this->payment->setAuthModel("PIN");
                      return $this->payment->chargePayment($array);
                  }
-             } else{
-                // $array["suggested_auth"] = "NOAUTH_INTERNATIONAL";
-                $this->payment->setAuthModel($result["data"]["authModelUsed"]);
-                return $result;
- 
-                 //TODO: Update $this->options with the billing addres details
-                 //$this->chargePayment($this->options) //uncomment this function when charging international cards
+                 else{
+                    
+
+                    $this->payment->setAuthModel("NOAUTH_INTERNATIONAL");
+                    return $this->payment->chargePayment($array);
+     
+                     //TODO: Update $this->options with the billing addres details
+                     //$this->chargePayment($this->options) //uncomment this function when charging international cards
+                 }
+             }else{
+                  // $array["suggested_auth"] = "NOAUTH_INTERNATIONAL";
+                  $this->payment->setAuthModel($result["data"]["authModelUsed"]);
+                  return $result;
              }
-            
+            return $this;
         }
 
          /**you will need to validate and verify the charge
