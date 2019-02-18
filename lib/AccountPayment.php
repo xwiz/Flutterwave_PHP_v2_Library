@@ -100,11 +100,13 @@ class Account {
         }
     function validateTransaction($otp){
             //validate the charge
+        $this->payment->eventHandler(new accountEventHandler);
         return $this->payment->validateTransaction($otp);//Uncomment this line if you need it
        }
     function verifyTransaction($txRef){
            //verify the charge
-        return $this->payment->verifyTransaction($txRef);//Uncomment this line if you need it
+        $this->payment->eventHandler(new accountEventHandler);
+        return $this->payment->verifyTransaction($txRef, $_ENV['SECRET_KEY']);//Uncomment this line if you need it
        }
     }
 ?>

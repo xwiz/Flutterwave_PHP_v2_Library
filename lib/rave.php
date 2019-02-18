@@ -687,12 +687,12 @@ class Rave {
      *  @param string
      *  @return object
      * */
-    function verifyTransaction($txref){
+    function verifyTransaction($txRef, $seckey){
         $this->logger->notice('Verifying transaction...');
         $this->setEndPoint("flwv3-pug/getpaidx/api/v2/verify");
         $this->post_data =  array( 
             'txref' => $txRef,
-            'SECKEY' => $this->secretKey
+            'SECKEY' => $seckey
             );
             $result  = $this->postURL($this->post_data);
             $result = json_decode($result,true);
