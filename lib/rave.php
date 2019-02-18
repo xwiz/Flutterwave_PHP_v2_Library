@@ -708,7 +708,7 @@ class Rave {
      * */
     function validateTransaction($otp){
         if(isset($this->authModelUsed)){
-            if($this->authModelUsed === "PIN"){
+            if($this->authModelUsed === "PIN" ){
                 $this->logger->notice('Validating otp...');
                 $this->setEndPoint("flwv3-pug/getpaidx/api/validatecharge");
                 $this->post_data = array(
@@ -721,7 +721,17 @@ class Rave {
             }elseif($this->authModelUsed === "VBVSECURECODE"){
                 $this->logger->notice('VBVSECURECODE...');
               //Validation for foreign cards
-              return "VBVSECURECODE";
+              return "Please validate using the authUrl";
+            }elseif($this->authModelUsed === "AUTH"){
+                $this->logger->notice('Validating otp...');
+                $this->setEndPoint("flwv3-pug/getpaidx/api/validate");
+                $this->post_data = array(
+                    'PBFPubKey' => $this->publicKey,
+                    'transactionreference' => $this->flwRef,
+                    'otp' => $otp);
+                $result  = $this->postURL($this->post_data);
+                return $result;
+
             }else{
                 $this->logger->error('You have not charged this transaction...');
             }
