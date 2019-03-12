@@ -264,7 +264,7 @@ class Rave {
      * @return string
      * */
     function getAmount(){
-        return $this;
+        return $this->amount;
     }
     
     /**
@@ -282,7 +282,7 @@ class Rave {
      * @return string
      * */
     function getPaymentMethod(){
-        return $this;
+        return $this->paymentMethod;
     }
     
     /**
