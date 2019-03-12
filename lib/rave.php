@@ -264,7 +264,7 @@ class Rave {
      * @return string
      * */
     function getAmount(){
-        return $this;
+        return $this->amount;
     }
     
     /**
