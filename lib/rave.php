@@ -695,7 +695,7 @@ class Rave {
             );
             $result  = $this->postURL($this->post_data);
             $result = json_decode($result,true);
-        $this->handler->onSuccessful($result);
+        return $result;
       
     }
 
