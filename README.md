@@ -247,6 +247,62 @@ $card = new Card();
 $result = $card->cardCharge($array);
 print_r($result);
 ```
+
+## Mobile Money Payments
+
+The following implementation shows how to initiate a mobile money payment
+```php
+require("Flutterwave-Rave-PHP-SDK/lib/MobileMoney.php");
+use Flutterwave\MobileMoney;
+
+$array = array(
+    "PBFPubKey" =>"****YOUR**PUBLIC**KEY****",
+    "currency"=> "GHS",
+    "payment_type" => "mobilemoneygh",
+    "country" => "GH",
+    "amount" => "10",
+    "email" => "eze@gmail.com",
+    "phonenumber"=> "054709929220",
+    "network"=> "MTN",
+    "firstname"=> "eze",
+    "lastname"=> "emmanuel",
+    "voucher"=> "128373", // only needed for Vodafone users.
+    "IP"=> "355426087298442",
+    "txRef"=> "MC-123456789",
+    "orderRef"=> "MC_123456789",
+    "is_mobile_money_gh"=> 1,
+    "redirect_url"=> "https://rave-webhook.herokuapp.com/receivepayment",
+    "device_fingerprint"=> "69e6b7f0b72037aa8428b70fbe03986c"
+
+);
+    $mobilemoney = new MobileMoney();
+    $result = $mobilemoney->mobilemoney($array);
+    $print_r($result);
+```
+## Create Vitual Cards
+
+The following implementation shows how to create virtual cards on rave
+```php
+require("Flutterwave-Rave-PHP-SDK/lib/VirtualCards.php");
+use Flutterwave\VirtualCard;
+
+$array = array(
+    "secret_key"=>"****YOUR**SECRET**KEY****",
+	"currency"=> "NGN",
+	"amount"=>"200",
+	"billing_name"=> "Mohammed Lawal",
+	"billing_address"=>"DREAM BOULEVARD",
+	"billing_city"=> "ADYEN",
+	"billing_state"=>"NEW LANGE",
+	"billing_postal_code"=> "293094",
+	"billing_country"=> "US"
+);
+    $virtualCard = new VirtualCard();
+    $result = $virtualCard->create($array);
+    print_r($result);
+```
+
+
 ## BVN Verification Sample implementation
 
 The following implementation shows how to verify a Bank Verification Number

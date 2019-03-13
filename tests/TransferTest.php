@@ -1,10 +1,8 @@
 <?php
+use PHPUnit\Framework\TestCase;
 
-class TransfersTest extends \PHPUnit_Framework_TestCase
+class TransfersTest extends TestCase
 {
-    public function testC()
-    {
-    }
 
 }
 

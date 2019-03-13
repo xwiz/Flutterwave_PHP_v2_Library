@@ -1,11 +1,8 @@
 <?php
+use PHPUnit\Framework\TestCase;
 
-class SubscriptionTest extends \PHPUnit_Framework_TestCase
+class SubscriptionTest extends TestCase
 {
-    public function testSubscriptionPaymentResponse()
-    {
-
-    }
 
 }
 

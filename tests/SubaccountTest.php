@@ -1,11 +1,8 @@
 <?php
+use PHPUnit\Framework\TestCase;
 
-class SubaccountTest extends \PHPUnit_Framework_TestCase
+class SubaccountTest extends TestCase
 {
-    public function testSubaccountCreationResponse()
-    {
-    }
-
 }
 
 ?>

@@ -1,11 +1,8 @@
 <?php
+use PHPUnit\Framework\TestCase;
 
-class TransactionVerificationTest extends \PHPUnit_Framework_TestCase
+class TransactionVerificationTest extends TestCase
 {
-    public function testTransactionVerificationResponse()
-    {
-
-    }
 
 }
 

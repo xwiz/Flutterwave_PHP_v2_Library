@@ -79,56 +79,35 @@ class cardEventHandler implements EventHandlerInterface{
     }
 }
 
-class Card {
+class MobileMoney {
     protected $payment;
     function __construct(){
         $this->payment = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
     }
-    function cardCharge($array){
+    function mobilemoney($array){
             //set the payment handler 
             $this->payment->eventHandler(new cardEventHandler)
             //set the endpoint for the api call
             ->setEndPoint("flwv3-pug/getpaidx/api/charge");
             //returns the value from the results
-            //$result = $this->payment->chargePayment($array);
             $result = $this->payment->chargePayment($array);
-                //check the value of the returned data for the suggested_auth response
-             if(isset($result["data"]["suggested_auth"])){
-                 if($result["data"]["suggested_auth"] === "PIN"){
-                     //validates the pin on the request data
-                     $this->payment->setAuthModel("PIN");
-                     return $this->payment->chargePayment($array);
-                 }
-                 else{
-                    
-
-                    $this->payment->setAuthModel("NOAUTH_INTERNATIONAL");
-                    return $this->payment->chargePayment($array);
-     
-                     //TODO: Update $this->options with the billing addres details
-                     //$this->chargePayment($this->options) //uncomment this function when charging international cards
-                 }
-             }else{
-                  // $array["suggested_auth"] = "NOAUTH_INTERNATIONAL";
+            if($result){
                   $this->payment->setAuthModel($result["data"]["authModelUsed"]);
                   return $result;
+             }else{
+                return json_decode(array(
+                    "error"=>"There was an error in charging this number"
+                ),true);
              }
-            return $this;
         }
 
-         /**you will need to validate and verify the charge
-             * Validating the charge will require an otp
+         /**you will need to verify the charge
              * After validation then verify the charge with the txRef
              * You can write out your function to execute when the verification is successful in the onSuccessful function
          ***/
-
-        function validateTransaction($otp){
-             //validate the charge
-           return $this->payment->validateTransaction($otp);//Uncomment this line if you need it
-        }
         function verifyTransaction($txRef){
             //verify the charge
-            return $this->payment->verifyTransaction($txRef, $seckey=$_ENV['SECRET_KEY']);//Uncomment this line if you need it
+            return $this->payment->verifyTransaction($txRef);//Uncomment this line if you need it
         }
       
 

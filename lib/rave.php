@@ -282,7 +282,7 @@ class Rave {
      * @return string
      * */
     function getPaymentMethod(){
-        return $this;
+        return $this->paymentMethod;
     }
     
     /**
@@ -587,10 +587,6 @@ class Rave {
         $this->createCheckSum();
         $this->transactionData = array_merge($this->transactionData, array('integrity_hash' => $this->integrityHash), array('meta' => $this->meta));
         
-        if(isset($this->handler)){
-            $this->handler->onInit($this->transactionData);
-        }
-        
         $json = json_encode($this->transactionData);
         echo '<html>';
         echo '<body>';
@@ -676,9 +672,8 @@ class Rave {
      function getURL($url){
         // make request to endpoint using unirest.
         $headers = array('Content-Type' => 'application/json');
-        //$body = Body::json($data);
+        $body = Body::json($data);
         $path = $this->baseUrl.'/'.$this->end_point;
-
         $response = Request::get($path.$url, $headers);
         return $response->raw_body;    // Unparsed body
      }
@@ -696,7 +691,7 @@ class Rave {
             );
             $result  = $this->postURL($this->post_data);
             $result = json_decode($result,true);
-        $this->handler->onSuccessful($result);
+        return $result;
       
     }
 
@@ -879,7 +874,22 @@ class Rave {
         //passes the result to the suggestedAuth function which re-initiates the charge 
         return $result;
      } 
-     
+     /**
+     * sends a post request to the virtual APi set by the user
+     *  @param array
+     *  @return object
+     * */
+
+     function vcPostRequest($array){
+        $this->post_data = $array;
+        //post the data to the API
+        $result  = $this->postURL($this->post_data);
+        //decode the response 
+        $result = json_decode($result, true);
+        //return result
+        print_r($result);
+       // return $result;
+     }   
     /**
          * Used to create sub account on the rave dashboard
          *  @param array

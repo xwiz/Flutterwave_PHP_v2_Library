@@ -1,11 +1,8 @@
 <?php
+use PHPUnit\Framework\TestCase;
 
-class UssdTest extends \PHPUnit_Framework_TestCase
+class UssdTest extends TestCase
 {
-    public function testC()
-    {
-
-    }
 
 }
 
