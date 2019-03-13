@@ -27,7 +27,7 @@ class VirtualCard {
             return $this->vc->vcPostRequest($array);
         }
     //list all the virtual cards on your profile
-    function List($array){
+    function list($array){
             //set the endpoint for the api call
             $this->vc->setEndPoint("v2/services/virtualcards/search");
             return $this->vc->vcPostRequest($array);
@@ -44,12 +44,12 @@ class VirtualCard {
             $this->vc->setEndPoint("v2/services/virtualcards/fund");
             return $this->vc->vcPostRequest($array);
         }
-    //list card transactions
-    // function transactions($array){
-    //         //set the endpoint for the api call
-    //         $this->vc->setEndPoint("v2/services/virtualcards/transactions");
-    //         return $this->vc->vcGetRequest($array);
-    //     }
+   // list card transactions
+    function transactions($array){
+            //set the endpoint for the api call
+            $this->vc->setEndPoint("v2/services/virtualcards/transactions");
+            return $this->vc->vcPostRequest($array);
+        }
     //withdraw funds from card
     function withdraw($array){
             //set the endpoint for the api call
