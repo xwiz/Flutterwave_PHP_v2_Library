@@ -587,10 +587,6 @@ class Rave {
         $this->createCheckSum();
         $this->transactionData = array_merge($this->transactionData, array('integrity_hash' => $this->integrityHash), array('meta' => $this->meta));
         
-        if(isset($this->handler)){
-            $this->handler->onInit($this->transactionData);
-        }
-        
         $json = json_encode($this->transactionData);
         echo '<html>';
         echo '<body>';

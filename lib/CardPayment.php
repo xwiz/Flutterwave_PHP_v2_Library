@@ -128,7 +128,7 @@ class Card {
         }
         function verifyTransaction($txRef){
             //verify the charge
-            return $this->payment->verifyTransaction($txRef);//Uncomment this line if you need it
+            return $this->payment->verifyTransaction($txRef, $seckey=$_ENV['SECRET_KEY']);//Uncomment this line if you need it
         }
       
 
