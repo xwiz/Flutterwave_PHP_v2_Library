@@ -1,10 +1,8 @@
 <?php
+use PHPUnit\Framework\TestCase;
 
-class PaymentPlanTest extends \PHPUnit_Framework_TestCase
+class PaymentPlanTest extends TestCase
 {
-    public function testPaymentPlanResponse()
-    {
-    }
 
 }
 

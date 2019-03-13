@@ -1,10 +1,8 @@
 <?php
+use PHPUnit\Framework\TestCase;
 
-class RecipientTest extends \PHPUnit_Framework_TestCase
+class RecipientTest extends TestCase
 {
-    public function testRecipientResponse()
-    {
-    }
 
 }
 
