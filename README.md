@@ -256,7 +256,7 @@ require("Flutterwave-Rave-PHP-SDK/lib/MobileMoney.php");
 use Flutterwave\MobileMoney;
 
 $array = array(
-    "PBFPubKey" =>"FLWPUBK-b55586524308f4b77b5523a59ebd66cf-X",
+    "PBFPubKey" =>"****YOUR**PUBLIC**KEY****",
     "currency"=> "GHS",
     "payment_type" => "mobilemoneygh",
     "country" => "GH",
@@ -278,6 +278,28 @@ $array = array(
     $mobilemoney = new MobileMoney();
     $result = $mobilemoney->mobilemoney($array);
     $print_r($result);
+```
+## Create Vitual Cards
+
+The following implementation shows how to create virtual cards on rave
+```php
+require("Flutterwave-Rave-PHP-SDK/lib/VirtualCards.php");
+use Flutterwave\VirtualCard;
+
+$array = array(
+    "secret_key"=>"****YOUR**SECRET**KEY****",
+	"currency"=> "NGN",
+	"amount"=>"200",
+	"billing_name"=> "Mohammed Lawal",
+	"billing_address"=>"DREAM BOULEVARD",
+	"billing_city"=> "ADYEN",
+	"billing_state"=>"NEW LANGE",
+	"billing_postal_code"=> "293094",
+	"billing_country"=> "US"
+);
+    $virtualCard = new VirtualCard();
+    $result = $virtualCard->create($array);
+    print_r($result);
 ```
 
 
