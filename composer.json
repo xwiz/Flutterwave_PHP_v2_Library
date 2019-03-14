@@ -1,8 +1,16 @@
 {
-    "name": "flutterwave/rave",
+    "name": "flutterwave/rave-php-sdk",
     "description": "A simple SDK for integrating to Flutterwave's Rave payment gateway",
     "type": "library",
+    "keywords": ["rave", "flutterwave", "payment", "transfers", "africa"],
+    "homepage": "https://github.com/Flutterwave/Flutterwave-Rave-PHP-SDK",
+    "autoload": {
+        "psr-4": {
+            "Flutterwave\\": "lib/Rave"
+        }
+    },
     "require": {
+        "php": ">=5.4.0",
         "monolog/monolog": "1.*",
         "mashape/unirest-php": "^3.0",
         "vlucas/phpdotenv": "^2.5"
