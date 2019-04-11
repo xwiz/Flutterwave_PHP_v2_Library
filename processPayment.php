@@ -9,21 +9,21 @@ include('lib/rave.php');
 include('lib/raveEventHandlerInterface.php');
 
 use Flutterwave\Rave;
-use Flutterwave\Rave\EventHandlerInterface;
+use Flutterwave\EventHandlerInterface;
 
-$URL = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://'.$_SERVER[HTTP_HOST].$_SERVER[REQUEST_URI];
+$URL = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
 $getData = $_GET;
 $postData = $_POST;
 $publicKey = $postData['publicKey'];
 $secretKey = $postData['secretKey'];
 $success_url = $postData['successurl'];
 $failure_url = $postData['failureurl'];
-$env = $postData['env']; // Remember to change this to 'live' when you are going live
+//$env = $postData['env']; // Remember to change this to 'live' when you are going live
 
 if($postData['amount']){
     $_SESSION['publicKey'] = $publicKey;
     $_SESSION['secretKey'] = $secretKey;
-    $_SESSION['env'] = $env;
+    //$_SESSION['env'] = $env;
     $_SESSION['successurl'] = $success_url;
     $_SESSION['failureurl'] = $failure_url;
     $_SESSION['currency'] = $postData['currency'];
@@ -39,7 +39,7 @@ if($postData['ref']){
     $overrideRef = true;
 }
 
-$payment = new Rave($_SESSION['publicKey'], $_SESSION['secretKey'], $prefix, $_SESSION['env'], $overrideRef);
+$payment = new Rave($_SESSION['publicKey'], $_SESSION['secretKey'], $prefix, $overrideRef);
 
 function getURL($url,$data = array()){
     $urlArr = explode('?',$url);
@@ -154,7 +154,7 @@ if($postData['amount']){
     $payment
     ->eventHandler(new myEventHandler)
     ->setAmount($postData['amount'])
-    ->setPaymentMethod($postData['payment_method']) // value can be card, account or both
+    ->setPaymentOptions($postData['payment_options']) // value can be card, account or both
     ->setDescription($postData['description'])
     ->setLogo($postData['logo'])
     ->setTitle($postData['title'])
