@@ -79,22 +79,24 @@ class Transfer {
     }
     //initiating a single transfer
     function singleTransfer($array){
-            //set the payment handler 
-            $this->transfer->eventHandler(new transferEventHandler)
-            //set the endpoint for the api call
-            ->setEndPoint("v2/gpx/transfers/create");
-            //returns the value from the results
-            return $this->transfer->transferSingle($array);
-        }
+        //set the payment handler 
+        $this->transfer->eventHandler(new transferEventHandler)
+        //set the endpoint for the api call
+        ->setEndPoint("v2/gpx/transfers/create");
+        //returns the value from the results
+        return $this->transfer->transferSingle($array);
+    }
+
      //initiating a bulk transfer
     function bulkTransfer($array){
-            //set the payment handler 
-            $this->transfer->eventHandler(new transferEventHandler)
-            //set the endpoint for the api call
-            ->setEndPoint("v2/gpx/transfers/create_bulk");
-            //returns the value from the results
-            return $this->ransfer->transferBulk($array);
-        }
+        //set the payment handler 
+        $this->transfer->eventHandler(new transferEventHandler)
+        //set the endpoint for the api call
+        ->setEndPoint("v2/gpx/transfers/create_bulk");
+        //returns the value from the results
+        return $this->transfer->transferBulk($array);
     }
+
+}
 
 ?>

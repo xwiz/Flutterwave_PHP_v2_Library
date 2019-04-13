@@ -31,11 +31,11 @@ class Rave {
     protected $payButtonText = 'Make Payment';
     protected $redirectUrl;
     protected $meta = array();
-    protected $env;
+    // protected $env;
     protected $transactionPrefix;
    // public $logger;
     protected $handler;
-    protected $stagingUrl = 'https://ravesandboxapi.flutterwave.com';
+    // protected $stagingUrl = 'https://ravesandboxapi.flutterwave.com';
     protected $liveUrl = 'https://api.ravepay.co';
     protected $baseUrl;
     protected $transactionData;
@@ -55,7 +55,7 @@ class Rave {
     protected $expiry_month;
     protected $expiry_year;
     protected $amount;
-    protected $paymentMethod = 'both';
+    protected $paymentOptions = Null;
     protected $customDescription;
     protected $customLogo;
     protected $customTitle;
@@ -81,10 +81,10 @@ class Rave {
      * @param boolean $overrideRefWithPrefix Set this parameter to true to use your prefix as the transaction reference
      * @return object
      * */
-    function __construct($publicKey, $secretKey, $env = 'staging', $prefix = 'RV', $overrideRefWithPrefix = false){
+    function __construct($publicKey, $secretKey, $prefix = 'RV', $overrideRefWithPrefix = false){
         $this->publicKey = $publicKey;
         $this->secretKey = $secretKey;
-        $this->env = $env;
+        // $this->env = $env;
         $this->transactionPrefix = $overrideRefWithPrefix ? $prefix : $prefix.'_';
         $this->overrideTransactionReference = $overrideRefWithPrefix;
         // create a log channel
@@ -94,13 +94,16 @@ class Rave {
 
         $this->createReferenceNumber();
         
-        if($this->env === 'staging'){
-            $this->baseUrl = $this->stagingUrl;
-        }elseif($this->env === 'live'){
-            $this->baseUrl = $this->liveUrl;
-        }else{
-            $this->baseUrl = $this->stagingUrl;
-        }
+        // if($this->env === 'staging'){
+        //     $this->baseUrl = $this->stagingUrl;
+        // }elseif($this->env === 'live'){
+        //     $this->baseUrl = $this->liveUrl;
+        // }else{
+        //     $this->baseUrl = $this->stagingUrl;
+        // }
+
+        // set the baseurl
+        $this->baseUrl = $this->liveUrl;
         
         $this->logger->notice('Rave Class Initializes....');
         return $this;
@@ -118,7 +121,7 @@ class Rave {
             "customer_email" => $this->customerEmail, 
             "customer_firstname" => $this->customerFirstname, 
             "txref" => $this->txref, 
-            "payment_method" => $this->paymentMethod, 
+            "payment_options" => $this->paymentOptions, 
             "customer_lastname" => $this->customerLastname, 
             "country" => $this->country, 
             "currency" => $this->currency, 
@@ -269,11 +272,11 @@ class Rave {
     
     /**
      * Sets the allowed payment methods
-     * @param string $paymentMethod The allowed payment methods. Can be card, account or both 
+     * @param string $paymentOptions The allowed payment methods. Can be card, account or both 
      * @return object
      * */
-    function setPaymentMethod($paymentMethod){
-        $this->paymentMethod = $paymentMethod;
+    function setPaymentOptions($paymentOptions){
+        $this->paymentOptions = $paymentOptions;
         return $this;
     }
     
@@ -281,8 +284,8 @@ class Rave {
      * gets the allowed payment methods
      * @return string
      * */
-    function getPaymentMethod(){
-        return $this->paymentMethod;
+    function getPaymentOptions(){
+        return $this->paymentOptions;
     }
     
     /**
