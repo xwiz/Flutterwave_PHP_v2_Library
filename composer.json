@@ -1,5 +1,5 @@
 {
-    "name": "flutterwave/rave-sdk-php",
+    "name": "emmajiugo/rave-php-sdk",
     "description": "A simple SDK for integrating to Flutterwave's Rave payment gateway",
     "type": "library",
     "keywords": ["rave", "flutterwave", "payment", "transfers", "africa"],
