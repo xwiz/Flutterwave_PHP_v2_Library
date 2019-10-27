@@ -10,7 +10,7 @@
         }
     },
     "require": {
-        "php": ">=5.4.0",
+        "php": ">=7.0.0",
         "monolog/monolog": "1.*",
         "mashape/unirest-php": "^3.0",
         "vlucas/phpdotenv": "^2.5"
