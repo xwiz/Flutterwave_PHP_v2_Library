@@ -9,7 +9,7 @@ Edit the `paymentForm.php` and `processPayment.php` files to suit your purpose. 
 Simply redirect to the `paymentForm.php` file on your browser to process a payment.
 
 The vendor folder is committed into the project to allow easy installation for those who do not have composer installed.
-It is recommended to update the project dependencies using;
+It is recommended to update the project dependencies using:
 
 ```shell
 $ composer install
