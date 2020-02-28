@@ -414,6 +414,7 @@ print_r($result);
 ## Bill Sample implememtation
 
 The following implementation shows how to pay for any kind of bill from Airtime to DSTv payments to Tolls.
+Please view the rave documentation section on Bill payment for different types of bill services you can pass into the ```payBill``` method as an```$array```.
 ```php
 require("Flutterwave-Rave-PHP-SDK/lib/Bill.php");
 use Flutterwave\Bill;
