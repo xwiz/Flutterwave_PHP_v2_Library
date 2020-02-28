@@ -411,7 +411,7 @@ $resultActivate = $subscription->activateSubscription($id);// activates a subscr
 //returns the result 
 print_r($result);
 ```
-## Bill Sample implememtation
+## Bill Sample implementation
 
 The following implementation shows how to pay for any kind of bill from Airtime to DSTv payments to Tolls.
 Please view the rave documentation section on Bill payment for different types of bill services you can pass into the ```payBill``` method as an```$array```.
@@ -441,6 +441,36 @@ $airtime = new Bill();
 $result = $airtime->payBill($array);
 print_r($result);
 ```
+
+## Ebill Sample implementation
+
+The following implementation shows how to create a electronic receipt.
+
+```php
+require("Flutterwave-Rave-PHP-SDK/lib/Ebill.php");
+use Flutterwave\Ebill;
+
+$array = array(
+"SECKEY" => "YOUR SECRET KEY",
+  "narration" => "",
+  "numberofunits" => 1,
+  "currency"=> "NGN",
+  "amount" => 60000,
+  "phonenumber" => "09067985861",
+  "email" => "user@gmail.com",
+  "txRef" => "",//must be unique
+  "IP" => "09067985861",
+  "country" => "NG",
+  "phonenumber" => "09067985861",
+  "custom_business_name" => "RaveShoppin" 
+);
+
+$receipt = new Ebill();
+$result = $receipt->order($array);
+print_r($result);
+```
+
+
 You can also find the class documentation in the docs folder. There you will find documentation for the `Rave` class and the `EventHandlerInterface`.
 
 Enjoy... :v:
