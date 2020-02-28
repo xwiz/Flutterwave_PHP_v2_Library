@@ -122,9 +122,9 @@ class Card {
              * You can write out your function to execute when the verification is successful in the onSuccessful function
          ***/
 
-        function validateTransaction($otp){
+        function validateTransaction($otp, $Ref){
              //validate the charge
-           return $this->payment->validateTransaction($otp);//Uncomment this line if you need it
+           return $this->payment->validateTransaction($otp, $Ref);//Uncomment this line if you need it
         }
         function verifyTransaction($txRef){
             //verify the charge
