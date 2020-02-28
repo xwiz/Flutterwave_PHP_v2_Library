@@ -97,6 +97,88 @@ class Transfer {
         return $this->transfer->transferBulk($array);
     }
 
+    function listTransfers($array){
+
+        //set the payment handler 
+        $this->transfer->eventHandler(new transferEventHandler)
+        //set the endpoint for the api call
+        ->setEndPoint("v2/gpx/transfers");
+
+        return $this->transfer->listTransfers($array);
+    }
+
+    function fetchATransfer($array){
+
+        //set the payment handler 
+        $this->transfer->eventHandler(new transferEventHandler)
+        //set the endpoint for the api call
+        ->setEndPoint("v2/gpx/transfers");
+
+        return $this->transfer->fetchATransfer($array);
+    }
+
+    function bulkTransferStatus(){
+
+         //set the payment handler 
+         $this->transfer->eventHandler(new transferEventHandler)
+         //set the endpoint for the api call
+         ->setEndPoint("v2/gpx/transfers");
+
+         return $this->transfer->bulkTransferStatus($array);
+    }
+    function getApplicableFees(){
+
+         //set the payment handler 
+         $this->transfer->eventHandler(new transferEventHandler)
+         //set the endpoint for the api call
+         ->setEndPoint("v2/gpx/transfers/fee");
+
+         return $this->transfer->applicableFees($array);
+    }
+
+    function getTransferBalance($array){
+
+        //set the payment handler 
+        $this->transfer->eventHandler(new transferEventHandler)
+        //set the endpoint for the api call
+        ->setEndPoint("v2/gpx/balance");
+
+        if(!isset($array['currency'])){
+            $array['currency'] = 'NGN';
+        }
+
+        return $this->transfer->getTransferBalance($array);
+
+    }
+
+    function verifyAccount($array){
+
+        //set the payment handler 
+        $this->transfer->eventHandler(new transferEventHandler)
+        //set the endpoint for the api call
+        ->setEndPoint("flwv3-pug/getpaidx/api/resolve_account");
+
+
+        return $this->transfer->verifyAccount($array);
+
+    }
+
+    function getBanksForTransfer($data = array("country" => 'NG')){
+        
+           //set the payment handler 
+           $this->transfer->eventHandler(new transferEventHandler)
+           //set the endpoint for the api call
+
+           ->setEndPoint("v2/banks/".$data['country']."/");
+        
+        
+        return $this->transfer->getBanksForTransfer();
+    }
+
+
+
+
+
 }
 
 ?>

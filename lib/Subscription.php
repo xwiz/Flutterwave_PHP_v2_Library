@@ -97,13 +97,13 @@ class Subscription{
             return $this->subscription->getAllSubscription();
         }
 
-    function fetchASubscription($email){
+    function fetchASubscription($data){
             //set the payment handler 
             $this->subscription->eventHandler(new subscriptionEventHandler)
             //set the endpoint for the api call
             ->setEndPoint("v2/gpx/subscriptions/query");
             //returns the value from the results
-            return $this->subscription->fetchASubscription($email);
+            return $this->subscription->fetchASubscription($data);
         }
     }
 ?>

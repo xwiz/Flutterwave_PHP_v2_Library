@@ -1,8 +1,6 @@
 <?php
-namespace Flutterwave;
 
-//uncomment if you need this
-//define("BASEPATH", 1);//Allow direct access to rave.php and raveEventHandler.php
+namespace Flutterwave;
 
 require_once('rave.php');
 require_once('raveEventHandlerInterface.php');
@@ -11,11 +9,9 @@ use Flutterwave\Rave;
 use Flutterwave\EventHandlerInterface;
 
 
-
-class cardEventHandler implements EventHandlerInterface{
+class virtualAccountEventHandler implements EventHandlerInterface{
     /**
-     * This is called only when a transaction is successful 
-     * @param array
+     * This is called only when a transaction is successful
      * */
     function onSuccessful($transactionData){
         // Get the transaction from your DB using the transaction reference (txref)
@@ -28,11 +24,6 @@ class cardEventHandler implements EventHandlerInterface{
         // Give value for the transaction
         // Update the transaction to note that you have given value for the transaction
         // You can also redirect to your success page from here
-        if($transactionData["data"]["chargecode"] === '00' || $transactionData["data"]["chargecode"] === '0'){
-            echo "Transaction Completed";
-        }else{
-          $this->onFailure($transactionData);
-      }
     }
     
     /**
@@ -79,38 +70,29 @@ class cardEventHandler implements EventHandlerInterface{
     }
 }
 
-class MobileMoney {
-    protected $payment;
+class VirtualAccount{
+
     function __construct(){
-        $this->payment = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
-    }
-    function mobilemoney($array){
-            //set the payment handler 
-            $this->payment->eventHandler(new cardEventHandler)
-            //set the endpoint for the api call
-            ->setEndPoint("flwv3-pug/getpaidx/api/charge");
-            //returns the value from the results
-            $result = $this->payment->chargePayment($array);
-            if($result){
-                  $this->payment->setAuthModel($result["data"]["authModelUsed"]);
-                  return $result;
-             }else{
-                return json_decode(array(
-                    "error"=>"There was an error in charging this number"
-                ),true);
-             }
-        }
-
-         /**you will need to verify the charge
-             * After validation then verify the charge with the txRef
-             * You can write out your function to execute when the verification is successful in the onSuccessful function
-         ***/
-        function verifyTransaction($txRef){
-            //verify the charge
-            return $this->payment->verifyTransaction($txRef);//Uncomment this line if you need it
-        }
-      
-
+        $this->va = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
     }
 
-?>
+    /**
+     * Creating the VirtualAccount
+     */
+
+    function virtualAccount($userdata){
+
+        $this->va->eventHandler(new virtualAccountEventHandler)
+        //set the endpoint for the api call
+        ->setEndPoint("v2/banktransfers/accountnumbers");
+        
+        //returns the value of the result.
+       return $this->va->createVirtualAccount($userdata);
+    }
+
+   
+}
+
+    
+
+

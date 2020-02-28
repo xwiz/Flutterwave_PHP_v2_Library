@@ -1,18 +1,13 @@
-<?php
+<?php 
+
 namespace Flutterwave;
-
-//uncomment if you need this
-//define("BASEPATH", 1);//Allow direct access to rave.php and raveEventHandler.php
-
-require_once('rave.php');
-require_once('raveEventHandlerInterface.php');
+require("lib/rave.php");
+require("lib/raveEventHandlerInterface.php");
 
 use Flutterwave\Rave;
 use Flutterwave\EventHandlerInterface;
 
-
-
-class cardEventHandler implements EventHandlerInterface{
+class mpesaEventHandler implements EventHandlerInterface{
     /**
      * This is called only when a transaction is successful 
      * @param array
@@ -79,38 +74,31 @@ class cardEventHandler implements EventHandlerInterface{
     }
 }
 
-class MobileMoney {
-    protected $payment;
+class Mpesa {
     function __construct(){
         $this->payment = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
     }
-    function mobilemoney($array){
-            //set the payment handler 
-            $this->payment->eventHandler(new cardEventHandler)
-            //set the endpoint for the api call
-            ->setEndPoint("flwv3-pug/getpaidx/api/charge");
-            //returns the value from the results
-            $result = $this->payment->chargePayment($array);
-            if($result){
-                  $this->payment->setAuthModel($result["data"]["authModelUsed"]);
-                  return $result;
-             }else{
-                return json_decode(array(
-                    "error"=>"There was an error in charging this number"
-                ),true);
-             }
-        }
 
-         /**you will need to verify the charge
-             * After validation then verify the charge with the txRef
-             * You can write out your function to execute when the verification is successful in the onSuccessful function
-         ***/
-        function verifyTransaction($txRef){
-            //verify the charge
-            return $this->payment->verifyTransaction($txRef);//Uncomment this line if you need it
-        }
-      
-
+    function mpesa($array){
+        //set the payment handler 
+        $this->payment->eventHandler(new mpesaEventHandler)
+        //set the endpoint for the api call
+        ->setEndPoint("flwv3-pug/getpaidx/api/charge");
+        //returns the value from the results
+        return $this->payment->chargePayment($array);
     }
 
-?>
+     /**you will need to verify the charge
+         * After validation then verify the charge with the txRef
+         * You can write out your function to execute when the verification is successful in the onSuccessful function
+     ***/
+    function verifyTransaction($txRef){
+        //verify the charge
+        return $this->payment->verifyTransaction($txRef);//Uncomment this line if you need it
+    }
+  
+
+}
+
+    
+
