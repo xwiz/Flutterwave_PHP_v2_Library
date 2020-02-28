@@ -12,7 +12,7 @@ class preEventHandler implements EventHandlerInterface{
 
 }
 
-class preauth {
+class Preauth {
     function __construct(){
         $this->preauthPayment =  new Rave();
     }
