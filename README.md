@@ -394,7 +394,7 @@ print_r($result);
 
 ## Subscriptions Sample implementation
 
-The following implementation shows how to activata a subscription, fetch a subscription, get all subscription
+The following implementation shows how to activate a subscription, fetch a subscription, get all subscription
 ```php
 require("Flutterwave-Rave-PHP-SDK/lib/Subscription.php");
 use Flutterwave\Subscription;
@@ -409,6 +409,34 @@ $resultGet = $subscription->getAllSubscription();//gets all existing subscriptio
 $resultActivate = $subscription->activateSubscription($id);// activates a subscription plan
 
 //returns the result 
+print_r($result);
+```
+## Bill Sample implememtation
+
+The following implementation shows how to pay for any kind of bill from Airtime to DSTv payments to Tolls.
+```php
+require("Flutterwave-Rave-PHP-SDK/lib/Bill.php");
+use Flutterwave\Bill;
+
+$array = array(
+"secret_key" => "YOUR SECRET KEY",
+  "service" => "fly_buy",
+  "service_method" => "post",
+  "service_version"=> "v1",
+  "service_channel" => "rave",
+  "service_payload" => array(
+    "Country" => "NG",
+    "CustomerId" => "+23490803840303",
+    "Reference" => "9300049404444",
+    "Amount" => 500,
+    "RecurringType" => 0,
+    "IsAirtime" => true,
+    "BillerName" => "AIRTIME"
+    )
+);
+
+$airtime = new Bill();
+$result = $airtime->payBill($array);
 print_r($result);
 ```
 You can also find the class documentation in the docs folder. There you will find documentation for the `Rave` class and the `EventHandlerInterface`.
