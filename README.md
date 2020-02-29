@@ -470,6 +470,27 @@ $result = $receipt->order($array);
 print_r($result);
 ```
 
+## VirtualAccount Sample implementation
+
+The following implementation shows how to create a virtual Account.
+Please view the documentation for more options that can be added in the payload
+https://developer.flutterwave.com/reference#create-a-virtual-account-number
+
+```php
+require("Flutterwave-Rave-PHP-SDK/lib/VirtualAccount.php");
+use Flutterwave\VirtualAccount;
+
+$array = array(
+"email" => "",
+  "seckey" => "YOUR SECRET KEY",
+  "narraction" => "John Doe", 
+);
+
+$account = new VirtualAccount();
+$result = $account->virtualAccount($array);
+print_r($result);
+```
+
 
 You can also find the class documentation in the docs folder. There you will find documentation for the `Rave` class and the `EventHandlerInterface`.
 
