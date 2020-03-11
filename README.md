@@ -527,6 +527,29 @@ $result = $payment->accountCharge($array);//to charge to card
 //print_r($refundOrVoid);
 print_r($result);
 ```
+## Tokenized Charge Sample implementation
+
+Once the charge and validation leg is complete for the first charge on the card, you can make use of the token for subsequent charges.
+
+```php
+require("Flutterwave-Rave-PHP-SDK/lib/TokenizedCharge.php");
+use Flutterwave\TokenizedCharge;
+
+$array = array(
+"email" => "",
+  "seckey" => "YOUR SECRET KEY",
+  "narraction" => "John Doe", 
+);
+
+$payment = new TokenizedCharge();
+$result = $payment->tokenCharge($array);
+//$updateEmailLinkedToToken = $payment->updateEmailTiedToToken($array);//updates email linked to the token
+//print_r($updateEmailLinkedToToken);
+//$bulkCharge = $payment->bulkCharge($array);//initiate bulk charges
+//print_r($bulkCharge);
+//$checkBulkStatus = $payment->bulkChargeStatus($array);//checks the status of the bulk charge.
+//print_r($checkBulkStatus);
+print_r($result);
 
 
 
