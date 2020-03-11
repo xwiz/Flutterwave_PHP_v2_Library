@@ -536,9 +536,18 @@ require("Flutterwave-Rave-PHP-SDK/lib/TokenizedCharge.php");
 use Flutterwave\TokenizedCharge;
 
 $array = array(
-"email" => "",
-  "seckey" => "YOUR SECRET KEY",
-  "narraction" => "John Doe", 
+"SECKEY":"FLWSECK-e6db11d1f8a6208de8cb2f94e293450e-X",
+"token":"flw-t1nf-404dff6823ff91ce154f04dd40085b9e-m03k",
+"currency":"NGN",
+"country":"NG",
+"amount":"100",
+"email":"user@example.com",
+"firstname":"Yemi",
+"lastname":"Oyeleke",
+"IP":"190.233.222.1",
+"narration":"Internet Renewal",
+"txRef":"MC_1522966555872",
+"meta":""
 );
 
 $payment = new TokenizedCharge();
@@ -550,6 +559,29 @@ $result = $payment->tokenCharge($array);
 //$checkBulkStatus = $payment->bulkChargeStatus($array);//checks the status of the bulk charge.
 //print_r($checkBulkStatus);
 print_r($result);
+
+## view Transactions Sample implementation
+
+ list all transactions on your account. You could do a specific query using ```customer_email``` or ```customer_fullname``` to make specifc search. View all successfull or failed transactions for a particular period, month or year.
+ Please read the MISCELLANEOUS section of the Api documentation for more option to pass.
+ https://developer.flutterwave.com/reference#list-transactions 
+
+```php
+require("Flutterwave-Rave-PHP-SDK/lib/Transactions.php");
+use Flutterwave\Transactions;
+
+$array = array(
+  "seckey"=> "Merchant secret key",
+  "from"=>"2018-01-01",
+  "to" => "2018-03-30",
+  "currency" => "NGN",
+  "status" => "successful" 
+);
+
+$payment = new Transactions();
+$result = $payment->viewTransactions($array);
+print_r($result);
+
 
 
 
