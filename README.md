@@ -490,6 +490,44 @@ $account = new VirtualAccount();
 $result = $account->virtualAccount($array);
 print_r($result);
 ```
+## Preauth Sample implementation
+
+Card preauthorisation allows a merchant preauthorise a specific amount to be paid by a customer. Once preauthorised successfully, a hold is put on the amount specified, and left for the merchant to capture that amount at a later time or date. Merchants after preauthorising can perform the following actions:void,refund, capture.
+Please note that for each action there is a different payload to pass as an array.
+
+```php
+require("Flutterwave-Rave-PHP-SDK/lib/Preauth.php");
+use Flutterwave\Preauth;
+
+$array = array(
+"PBFPubKey"=> "FLWPUBK-7adb6177bd71dd43c2efa3f1229e3b7f-X",
+  "cardno"=> "5438898014560229",
+  "charge_type"=> "preauth",
+  "cvv"=> "812",
+  "expirymonth"=> "08",
+  "expiryyear"=> "20",
+  "currency"=> "NGN",
+  "country"=> "NG",
+  "amount"=> "100",
+  "email"=> "user@example.com",
+  "phonenumber"=> "08056552980",
+  "firstname"=> "user",
+  "lastname"=> "example",
+  "IP"=> "40.198.14",
+  "txRef"=> "MC-" + Date.now(),
+  "redirect_url"=> "https://rave-web.herokuapp.com/receivepayment",
+  "device_fingerprint"=> "69e6b7f0b72037aa8428b70fbe03986c"
+);
+
+$payment = new Preauth();
+$result = $payment->accountCharge($array);//to charge to card
+//$capturePayment = $payment->captureFunds($array);//note the elements in the $array for this would be different refer to documentation //on data to bepass
+//print_r($capturePayment);
+//$refundOrVoid = $payment->refundOrVoid($array);
+//print_r($refundOrVoid);
+print_r($result);
+```
+
 
 
 You can also find the class documentation in the docs folder. There you will find documentation for the `Rave` class and the `EventHandlerInterface`.
