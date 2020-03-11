@@ -514,7 +514,7 @@ $array = array(
   "firstname"=> "user",
   "lastname"=> "example",
   "IP"=> "40.198.14",
-  "txRef"=> "MC-" + Date.now(),
+  "txRef"=> "MC-12344358",//must be unique
   "redirect_url"=> "https://rave-web.herokuapp.com/receivepayment",
   "device_fingerprint"=> "69e6b7f0b72037aa8428b70fbe03986c"
 );
