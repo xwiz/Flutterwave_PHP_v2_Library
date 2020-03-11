@@ -90,7 +90,7 @@ class TokinizedCharge {
             ->setEndPoint("flwv3-pug/getpaidx/api/tokenized/charge");
             //returns the value from the results
             //you can choose to store the returned value in a variable and validate within this function
-            return $this->payment->postURL($data);
+            return $this->payment->postURL($array);
           
     }
     
