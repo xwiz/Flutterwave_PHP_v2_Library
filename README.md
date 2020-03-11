@@ -521,7 +521,7 @@ $array = array(
 
 $payment = new Preauth();
 $result = $payment->accountCharge($array);//to charge to card
-//$capturePayment = $payment->captureFunds($array);//note the elements in the $array for this would be different refer to documentation //on data to bepass
+//$capturePayment = $payment->captureFunds($array);//note the payload ```$array``` for this would be different. refer to documentation //on data to be passed.
 //print_r($capturePayment);
 //$refundOrVoid = $payment->refundOrVoid($array);
 //print_r($refundOrVoid);
