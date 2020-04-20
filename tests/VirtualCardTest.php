@@ -35,7 +35,7 @@ class VirtualCardTest extends TestCase
         $double = Mockery::mock(virtualCardAPI::class);
         $virtualCard = new VirtualCard();
         $result = $virtualCard->create($array);
-        $this->assertInstanceOf($double->shouldReceive('create')->with($aray)->andReturn(array()), []);
+        $this->assertInstanceOf($double->shouldReceive('create')->with($array)->andReturn(array()), []);
 
     }
 

@@ -74,6 +74,7 @@ class transactionVerificationEventHandler implements EventHandlerInterface{
 
 class TransactionVerification {
     protected $validate;
+
     function __construct(){
         $this->validate = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
     }
@@ -84,4 +85,5 @@ class TransactionVerification {
             return $this->validate->verifyTransaction($txref);
         }
     }
+    
 ?>
