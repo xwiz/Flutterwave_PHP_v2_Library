@@ -559,6 +559,7 @@ $result = $payment->tokenCharge($array);
 //$checkBulkStatus = $payment->bulkChargeStatus($array);//checks the status of the bulk charge.
 //print_r($checkBulkStatus);
 print_r($result);
+```
 
 ## view Transactions Sample implementation
 
