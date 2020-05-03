@@ -28,14 +28,14 @@ class Rave {
     protected $secretKey;
     protected $txref;
     protected $integrityHash;
-    protected $payButtonText = 'Make Payment';
+    protected $payButtonText = 'Proceed with Payment';
     protected $redirectUrl;
     protected $meta = array();
-    // protected $env;
+    protected $env;
     protected $transactionPrefix;
    // public $logger;
     protected $handler;
-    // protected $stagingUrl = 'https://ravesandboxapi.flutterwave.com';
+    protected $stagingUrl = 'https://ravesandboxapi.flutterwave.com';
     protected $liveUrl = 'https://api.ravepay.co';
     protected $baseUrl;
     protected $transactionData;
@@ -81,10 +81,10 @@ class Rave {
      * @param boolean $overrideRefWithPrefix Set this parameter to true to use your prefix as the transaction reference
      * @return object
      * */
-    function __construct($publicKey, $secretKey, $prefix = 'RV', $overrideRefWithPrefix = false){
+    function __construct($publicKey, $secretKey, $prefix = 'RV', $overrideRefWithPrefix = false, $env){
         $this->publicKey = $publicKey;
         $this->secretKey = $secretKey;
-        // $this->env = $env;
+        $this->env = $env;
         $this->transactionPrefix = $overrideRefWithPrefix ? $prefix : $prefix.'_';
         $this->overrideTransactionReference = $overrideRefWithPrefix;
         // create a log channel
@@ -94,16 +94,16 @@ class Rave {
 
         $this->createReferenceNumber();
         
-        // if($this->env === 'staging'){
-        //     $this->baseUrl = $this->stagingUrl;
-        // }elseif($this->env === 'live'){
-        //     $this->baseUrl = $this->liveUrl;
-        // }else{
-        //     $this->baseUrl = $this->stagingUrl;
-        // }
+        if($this->env === 'staging'){
+            $this->baseUrl = $this->stagingUrl;
+        }elseif($this->env === 'live'){
+            $this->baseUrl = $this->liveUrl;
+        }else{
+            $this->baseUrl = $this->stagingUrl;
+        }
 
         // set the baseurl
-        $this->baseUrl = $this->liveUrl;
+        //$this->baseUrl = $this->liveUrl;
         
         $this->logger->notice('Rave Class Initializes....');
         return $this;
@@ -587,6 +587,7 @@ class Rave {
      * @return string
      * */
     function initialize(){
+
         $this->createCheckSum();
         $this->transactionData = array_merge($this->transactionData, array('integrity_hash' => $this->integrityHash), array('meta' => $this->meta));
         
@@ -634,6 +635,8 @@ class Rave {
     {
         $encData = openssl_encrypt($data, 'DES-EDE3', $key, OPENSSL_RAW_DATA);
         return base64_encode($encData);
+
+
     }
     /**
      * this is the encryption function that combines the getkey() and encryptDes().
