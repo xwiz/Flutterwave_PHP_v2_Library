@@ -74,15 +74,35 @@ class ussdEventHandler implements EventHandlerInterface{
 class Ussd {
     protected $ussd;
     function __construct(){
-        $ussd = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->payment = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY']);
+        $this->type = "qr";
     }
     function ussd($array){
-            //set the payment handler 
-            $this->ussd->eventHandler(new ussdEventHandler)
-            //set the endpoint for the api call
-            ->setEndPoint("flwv3-pug/getpaidx/api/v2/hosted/pay");
-            //returns the value from the results
-            return $this->ussd->pay($array);
+
+            //add tx_ref to the paylaod
+        $array['public_key'] = $_ENV['PUBLIC_KEY'];
+        $array['tx_ref'] = $this->payment->txref;
+
+
+        if($array['type'] !== $this->type){
+            echo '<div class="alert alert-danger" role="alert">
+            The Type specified in the payload  is not <b> "'.$this->type.'"</b>
+          </div>';
         }
+                 //set the payment handler 
+                 $this->payment->eventHandler(new ussdEventHandler)
+                 //set the endpoint for the api call
+                 ->setEndPoint("v3/charges?type=".$this->type);
+                 //returns the value from the results
+                 return $this->payment->chargePayment($array);
+        
+           
+    }
+
+    function verifyTransaction(){
+        //verify the charge
+        return $this->payment->verifyTransaction($this->payment->txref);//Uncomment this line if you need it
+    }
+
 }
 ?>

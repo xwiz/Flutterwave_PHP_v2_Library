@@ -81,39 +81,49 @@ class Account {
     protected $payment;
 
     function __construct(){
-        $this->payment = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->payment = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY']);
+        $this->type = array('debit_uk_account','debit_ng_account');
+        $this->valType = "account";
     }
     function accountCharge($array){
             //set the payment handler 
-            $this->payment->eventHandler(new accountEventHandler)
-            //set the endpoint for the api call
-            ->setEndPoint("flwv3-pug/getpaidx/api/charge");
-            //returns the value from the results
-            //you can choose to store the returned value in a variable and validate within this function
-            $this->payment->setAuthModel("AUTH");
-            return $this->payment->chargePayment($array);
-            /**you will need to validate and verify the charge
-             * Validating the charge will require an otp
-             * After validation then verify the charge with the txRef
-             * You can write out your function to execute when the verification is successful in the onSuccessful function
-             ***/
+
+            //add tx_ref to the paylaod
+        $array['public_key'] = $_ENV['PUBLIC_KEY'];
+        $array['tx_ref'] = $this->payment->txref;
+
+
+        if(!in_array($array['type'], $this->type)){
+            echo '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
+            The Type specified in the payload  is not <b> "'.$this->type[0].' or '.$this->type[1].'"</b>
+          </div>';
         }
-    function validateTransaction($otp,$authModel,$Ref){
+
+
+            $this->payment->eventHandler(new accountEventHandler);
+            //set the endpoint for the api call
+            if ($this->type === $this->type[0]){
+                $this->payment->setEndPoint("v3/charges?type=debit_uk_account");
+            }else{
+                $this->payment->setEndPoint("v3/charges?type=debit_ng_account");
+            }
+
+            
+            return $this->payment->chargePayment($array);
+           
+        }
+    function validateTransaction($otp){
             //validate the charge
         $this->payment->eventHandler(new accountEventHandler);
 
-        if($authModel == 'PIN'){
-        return $this->payment->validateTransaction($otp, $Ref);//Uncomment this line if you need it
-        }
-        return $this->payment->validateTransaction2($otp, $Ref);//Uncomment this line if you need it
-
+        return $this->payment->validateTransaction($otp, $this->valType);//Uncomment this line if you need it
+        
        }
        
-    function verifyTransaction($txRef){
-           //verify the charge
-        $this->payment->eventHandler(new accountEventHandler);
-        return $this->payment->verifyTransaction($txRef, $_ENV['SECRET_KEY']);//Uncomment this line if you need it
-       }
+       function verifyTransaction(){
+        //verify the charge
+        return $this->payment->verifyTransaction($this->payment->txref);//Uncomment this line if you need it
+        }
     }
 
     

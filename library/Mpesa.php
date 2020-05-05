@@ -1,8 +1,8 @@
 <?php 
 
 namespace Flutterwave;
-require("lib/rave.php");
-require("lib/raveEventHandlerInterface.php");
+require("rave.php");
+require("raveEventHandlerInterface.php");
 
 use Flutterwave\Rave;
 use Flutterwave\EventHandlerInterface;
@@ -76,14 +76,26 @@ class mpesaEventHandler implements EventHandlerInterface{
 
 class Mpesa {
     function __construct(){
-        $this->payment = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->payment = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY']);
+        $this->type = "mpesa";
     }
 
     function mpesa($array){
+
+        //add tx_ref to the paylaod
+        $array['public_key'] = $_ENV['PUBLIC_KEY'];
+        $array['tx_ref'] = $this->payment->txref;
+
+
+        if($array['type'] !== $this->type){
+            echo '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
+            The Type specified in the payload  is not <b> "'.$this->type.'"</b>
+          </div>';
+        }
         //set the payment handler 
         $this->payment->eventHandler(new mpesaEventHandler)
         //set the endpoint for the api call
-        ->setEndPoint("flwv3-pug/getpaidx/api/charge");
+        ->setEndPoint("v3/charges?type=".$this->type);
         //returns the value from the results
         return $this->payment->chargePayment($array);
     }
@@ -92,9 +104,9 @@ class Mpesa {
          * After validation then verify the charge with the txRef
          * You can write out your function to execute when the verification is successful in the onSuccessful function
      ***/
-    function verifyTransaction($txRef){
+    function verifyTransaction(){
         //verify the charge
-        return $this->payment->verifyTransaction($txRef);//Uncomment this line if you need it
+        return $this->payment->verifyTransaction($this->payment->txref);//Uncomment this line if you need it
     }
   
 

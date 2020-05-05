@@ -1,18 +1,13 @@
-<?php
+<?php 
+
 namespace Flutterwave;
-
-//uncomment if you need this
-//define("BASEPATH", 1);//Allow direct access to rave.php and raveEventHandler.php
-
-
-require_once('raveEventHandlerInterface.php');
+require("rave.php");
+require("raveEventHandlerInterface.php");
 
 use Flutterwave\Rave;
 use Flutterwave\EventHandlerInterface;
 
-
-
-class cardEventHandler implements EventHandlerInterface{
+class voucherEventHandler implements EventHandlerInterface{
     /**
      * This is called only when a transaction is successful 
      * @param array
@@ -79,42 +74,41 @@ class cardEventHandler implements EventHandlerInterface{
     }
 }
 
-class Card {
-    protected $payment;
+class VoucherPayment {
     function __construct(){
-        $this->payment = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
-        $this->valType = "card";
-    }
-    function cardCharge($array){
-            //set the payment handler 
-            $this->payment->eventHandler(new cardEventHandler)
-            //set the endpoint for the api call
-            ->setEndPoint("/v3/charges");
-            //returns the value from the results
-            //$result = $this->payment->chargePayment($array);
-            $result = $this->payment->chargePayment($array);
-
-            return $this;
-        }
-
-         /**you will need to validate and verify the charge
-             * Validating the charge will require an otp
-             * After validation then verify the charge with the txRef
-             * You can write out your function to execute when the verification is successful in the onSuccessful function
-         ***/
-
-        function validateTransaction($otp){
-             //validate the charge
-           return $this->payment->validateTransaction($otp, $this->valType);//Uncomment this line if you need it
-        }
-
-        
-        function verifyTransaction($txRef){
-            //verify the charge
-            return $this->payment->verifyTransaction($txRef, $seckey=$_ENV['SECRET_KEY']);//Uncomment this line if you need it
-        }
-      
-
+        $this->payment = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY']);
+        $this->type = "voucher_payment";
     }
 
-?>
+    function voucher($array){
+
+        //add tx_ref to the paylaod
+        $array['public_key'] = $_ENV['PUBLIC_KEY'];
+        $array['tx_ref'] = $this->payment->txref;
+
+        if($array['type'] !== $this->type){
+            echo '<div class="alert alert-danger" role="alert">
+            The Type specified in the payload  is not <b> "'.$this->type.'"</b>
+          </div>';
+        }
+        //set the payment handler 
+        $this->payment->eventHandler(new voucherEventHandler)
+        //set the endpoint for the api call
+        ->setEndPoint("v3/charges?type=".$this->type);
+        //returns the value from the results
+        return $this->payment->chargePayment($array);
+    }
+
+     /**you will need to verify the charge
+         * After validation then verify the charge with the txRef
+         * You can write out your function to execute when the verification is successful in the onSuccessful function
+     ***/
+    function verifyTransaction(){
+        //verify the charge
+        return $this->payment->verifyTransaction($this->payment->txref);//Uncomment this line if you need it
+    }
+
+}
+
+    
+

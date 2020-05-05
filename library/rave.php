@@ -26,12 +26,12 @@ class Rave {
     //Api keys
     protected $publicKey;
     protected $secretKey;
-    protected $txref;
+    public $txref;
     protected $integrityHash;
     protected $payButtonText = 'Proceed with Payment';
     protected $redirectUrl;
     protected $meta = array();
-    protected $env;
+    //protected $env;
     protected $transactionPrefix;
    // public $logger;
     protected $handler;
@@ -70,7 +70,7 @@ class Rave {
     protected $end_point ;
     protected $authModelUsed;
     protected $flwRef;
-    protected $txRef;
+    protected $type;
 
     /**
      * Construct
@@ -81,10 +81,10 @@ class Rave {
      * @param boolean $overrideRefWithPrefix Set this parameter to true to use your prefix as the transaction reference
      * @return object
      * */
-    function __construct($publicKey, $secretKey, $prefix = 'RV', $overrideRefWithPrefix = false, $env){
+    function __construct($publicKey, $secretKey, $prefix = 'RV', $overrideRefWithPrefix = false){
         $this->publicKey = $publicKey;
         $this->secretKey = $secretKey;
-        $this->env = $env;
+        $this->env = $_ENV['RAVE_ENVIRONMENT'];
         $this->transactionPrefix = $overrideRefWithPrefix ? $prefix : $prefix.'_';
         $this->overrideTransactionReference = $overrideRefWithPrefix;
         // create a log channel
@@ -595,7 +595,9 @@ class Rave {
         echo '<html>';
         echo '<body>';
         echo '<center>Proccessing...<br /><img src="ajax-loader.gif" /></center>';
-        echo '<script type="text/javascript" src="'.$this->baseUrl.'/flwv3-pug/getpaidx/api/flwpbf-inline.js"></script>';
+        //'.$this->baseUrl.'/flwv3-pug/getpaidx/api/flwpbf-inline.js
+        //https://checkout.flutterwave.com/v3.js - inline
+        echo '<script type="text/javascript" src="https://checkout.flutterwave.com/v3.js"></script>';
         echo '<script>';
 	    echo 'document.addEventListener("DOMContentLoaded", function(event) {';
         echo 'var data = JSON.parse(\''.$json.'\');';
@@ -677,7 +679,8 @@ class Rave {
 
      function getURL($url){
         // make request to endpoint using unirest.
-        $headers = array('Content-Type' => 'application/json');
+        $bearerTkn = 'Bearer '.$this->secretKey;
+        $headers = array('Content-Type' => 'application/json', 'Authorization'=> $bearerTkn);
         //$body = Body::json($data);
         $path = $this->baseUrl.'/'.$this->end_point;
         $response = Request::get($path.$url, $headers);
@@ -688,15 +691,17 @@ class Rave {
      *  @param string
      *  @return object
      * */
-    function verifyTransaction($txRef, $seckey){
+    function verifyTransaction(){
+
+        $url = "/".$this->txref."/verify";
         $this->logger->notice('Verifying transaction...');
-        $this->setEndPoint("flwv3-pug/getpaidx/api/v2/verify");
-        $this->post_data =  array( 
-            'txref' => $txRef,
-            'SECKEY' => $seckey
-            );
-            $result  = $this->postURL($this->post_data);
+        $this->setEndPoint("v3/transactions");
+            $result  = $this->getURL($url);
             $result = json_decode($result,true);
+           
+            
+
+
         return $result;
       
     }
@@ -707,14 +712,14 @@ class Rave {
      *  @param string
      *  @return object
      * */
-    function validateTransaction($otp,$Ref){
+    function validateTransaction($otp,$type){
 
-        //pin
+        
                 $this->logger->notice('Validating otp...');
-                $this->setEndPoint("flwv3-pug/getpaidx/api/validatecharge");
+                $this->setEndPoint("v3/charges/".$this->flwRef."/validate");
                 $this->post_data = array(
-                    'PBFPubKey' => $this->publicKey,
-                    'transaction_reference' => $Ref,
+                    'public_key' => $this->publicKey,
+                    'type' => $type,//type can be card or account
                     'otp' => $otp);
                 $result  = $this->postURL($this->post_data);
                 return $result;
@@ -893,32 +898,67 @@ class Rave {
      * */
 
      function chargePayment($array){
+
+        
+
         $this->options = $array;
-        $this->json_options = json_encode($this->options);
         
-        $this->logger->notice('Checking payment details..');
-        //encrypt the required options to pass to the server
-        $this->integrityHash = $this->encryption($this->json_options);
-
-        $this->post_data = array(
-            'PBFPubKey' => $this->publicKey,
-            'client' => $this->integrityHash,
-            'alg' => '3DES-24');
-
-        $result  = $this->postURL($this->post_data);
+        //For Card which is now a Copliance Approve Issue
+        if(in_array('card', $array )){
+            $this->json_options = json_encode($this->options);
         
-        $this->logger->notice('Payment requires validation..'); 
+            $this->logger->notice('Checking payment details..');
+
+             //encrypt the required options to pass to the server
+            $this->integrityHash = $this->encryption($this->json_options);
+
+            
+            
+            $this->post_data = array(
+                'public_key' => $this->publicKey,
+                'client' => $this->integrityHash,
+                'alg' => '3DES-24');
+
+            $result  = $this->postURL($this->post_data);
+
+            $this->logger->notice('Payment requires validation..'); 
         // the result returned requires validation
         $result = json_decode($result, true);
 
         if(isset($result['data']['authModelUsed'])){
             $this->logger->notice('Payment requires otp validation...');
             $this->authModelUsed = $result['data']['authModelUsed'];
-            $this->flwRef = $result['data']['flwRef'];
-            $this->txRef = $result['data']['txRef'];
+            $this->flwRef = $result['data']['flw_ref'];
+            $this->txRef = $result['data']['tx_ref'];
         }
         //passes the result to the suggestedAuth function which re-initiates the charge 
         return $result;
+
+        }else{
+
+           $result = $this->postURL($this->options);
+           
+           $this->logger->notice('Payment requires validation..'); 
+       // the result returned requires validation
+        $result = json_decode($result, true);
+
+        if(isset($result['data']['authModelUsed'])){
+            $this->logger->notice('Payment requires otp validation...');
+            $this->authModelUsed = $result['data']['auth_model'];
+            $this->flwRef = $result['data']['flw_ref'];
+            $this->txref = $result['data']['tx_ref'];
+        }
+
+        $this->flwRef = $result['data']['flw_ref'];
+        $this->txref = $result['data']['tx_ref'];
+
+
+        
+        return $result; 
+        }
+       
+        
+        
      } 
      /**
      * sends a post request to the virtual APi set by the user
