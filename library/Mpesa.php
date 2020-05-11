@@ -24,9 +24,13 @@ class mpesaEventHandler implements EventHandlerInterface{
         // Update the transaction to note that you have given value for the transaction
         // You can also redirect to your success page from here
         if($transactionData["data"]["chargecode"] === '00' || $transactionData["data"]["chargecode"] === '0'){
+        
             echo "Transaction Completed";
+
         }else{
+
           $this->onFailure($transactionData);
+
       }
     }
     
@@ -76,22 +80,24 @@ class mpesaEventHandler implements EventHandlerInterface{
 
 class Mpesa {
     function __construct(){
-        $this->payment = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY']);
+        $this->payment = new Rave($_SERVER['SECRET_KEY']);
         $this->type = "mpesa";
     }
 
     function mpesa($array){
 
         //add tx_ref to the paylaod
-        $array['public_key'] = $_ENV['PUBLIC_KEY'];
-        $array['tx_ref'] = $this->payment->txref;
+        if(!isset($array['tx_ref']) || empty($array['tx_ref'])){
+            $array['tx_ref'] = $this->payment->txref;
+        }
 
-
+        
         if($array['type'] !== $this->type){
             echo '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
             The Type specified in the payload  is not <b> "'.$this->type.'"</b>
           </div>';
         }
+        
         //set the payment handler 
         $this->payment->eventHandler(new mpesaEventHandler)
         //set the endpoint for the api call

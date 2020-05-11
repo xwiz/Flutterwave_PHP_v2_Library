@@ -81,9 +81,9 @@ class Rave {
      * @param boolean $overrideRefWithPrefix Set this parameter to true to use your prefix as the transaction reference
      * @return object
      * */
-    function __construct($publicKey, $secretKey, $prefix = 'RV', $overrideRefWithPrefix = false){
-        $this->publicKey = $publicKey;
+    function __construct($secretKey,$prefix = 'RV', $overrideRefWithPrefix = false){
         $this->secretKey = $secretKey;
+        $this->public = $_ENV['PUBLIC_KEY'];
         $this->env = $_ENV['RAVE_ENVIRONMENT'];
         $this->transactionPrefix = $overrideRefWithPrefix ? $prefix : $prefix.'_';
         $this->overrideTransactionReference = $overrideRefWithPrefix;
@@ -116,7 +116,7 @@ class Rave {
     function createCheckSum(){
         $this->logger->notice('Generating Checksum....');
         $options = array( 
-            "PBFPubKey" => $this->publicKey, 
+            "public_key" => $this->publicKey, 
             "amount" => $this->amount, 
             "customer_email" => $this->customerEmail, 
             "customer_firstname" => $this->customerFirstname, 
@@ -662,8 +662,10 @@ class Rave {
      * */
 
     function postURL($data){
-        // make request to endpoint using unirest.
-        $headers = array('Content-Type' => 'application/json');
+        // make request to endpoint using unirest
+
+        $bearerTkn = 'Bearer '.$this->secretKey;
+        $headers = array('Content-Type' => 'application/json','Authorization'=> $bearerTkn);
         $body = Body::json($data);
         $url = $this->baseUrl.'/'.$this->end_point;
         $response = Request::post($url, $headers, $body);
@@ -718,7 +720,6 @@ class Rave {
                 $this->logger->notice('Validating otp...');
                 $this->setEndPoint("v3/charges/".$this->flwRef."/validate");
                 $this->post_data = array(
-                    'public_key' => $this->publicKey,
                     'type' => $type,//type can be card or account
                     'otp' => $otp);
                 $result  = $this->postURL($this->post_data);
@@ -739,11 +740,7 @@ class Rave {
 
 
     }
-    
-                
-            
-        
-    
+
 
       /**
      * Get all Transactions
@@ -898,9 +895,6 @@ class Rave {
      * */
 
      function chargePayment($array){
-
-        
-
         $this->options = $array;
         
         //For Card which is now a Copliance Approve Issue
@@ -915,8 +909,8 @@ class Rave {
             
             
             $this->post_data = array(
-                'public_key' => $this->publicKey,
-                'client' => $this->integrityHash,
+             'public_key' => $this->publicKey,
+             'client' => $this->integrityHash,
                 'alg' => '3DES-24');
 
             $result  = $this->postURL($this->post_data);
@@ -937,12 +931,14 @@ class Rave {
         }else{
 
            $result = $this->postURL($this->options);
+
+           print_r($result);
            
            $this->logger->notice('Payment requires validation..'); 
        // the result returned requires validation
         $result = json_decode($result, true);
 
-        if(isset($result['data']['authModelUsed'])){
+        if(isset($result['data']['status'])){
             $this->logger->notice('Payment requires otp validation...');
             $this->authModelUsed = $result['data']['auth_model'];
             $this->flwRef = $result['data']['flw_ref'];
@@ -1058,7 +1054,6 @@ class Rave {
         $this->logger->notice('updating Ebill order..');
         
         $data = array(
-            'SECKEY' => $this->secretKey,
             'reference' => $array['flwRef'],
             'currency' => 'NGN',
             'amount' => $array['amount'],
@@ -1255,7 +1250,6 @@ class Rave {
         $data = array(
             "recipientaccount"=> $array['recipientaccount'],
             "destbankcode"=> $array['destbankcode'],
-            "PBFPubKey"=>$this->publicKey,
             "currency" => $array['currency'],
             "country" => $array['country']
             
@@ -1273,7 +1267,7 @@ class Rave {
         $this->logger->notice('Fetching banks available for Transfer...');
 
           //get banks for transfer
-        $url = "?public_key=".$this->publickey;
+        $url = "";
         $result = $this->getURL($url);
 
      }

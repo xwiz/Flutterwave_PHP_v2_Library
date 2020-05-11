@@ -74,14 +74,16 @@ class ussdEventHandler implements EventHandlerInterface{
 class Ussd {
     protected $ussd;
     function __construct(){
-        $this->payment = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY']);
+        $this->payment = new Rave($_ENV['SECRET_KEY']);
         $this->type = "qr";
     }
     function ussd($array){
 
             //add tx_ref to the paylaod
-        $array['public_key'] = $_ENV['PUBLIC_KEY'];
-        $array['tx_ref'] = $this->payment->txref;
+            if(!isset($array['tx_ref']) || empty($array['tx_ref'])){
+                $array['tx_ref'] = $this->payment->txref;
+            }
+    
 
 
         if($array['type'] !== $this->type){
