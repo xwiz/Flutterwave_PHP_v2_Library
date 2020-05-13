@@ -82,13 +82,15 @@ class momoEventHandler implements EventHandlerInterface{
 class MobileMoney {
     protected $payment;
     function __construct(){
-        $this->payment = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY']);
+        $this->payment = new Rave($_ENV['SECRET_KEY'],"Trn");
         $this->type = array("mobile_money_ghana","mobile_money_uganda","mobile_money_zambia","mobile_money_rwanda");
     }
     function mobilemoney($array){
          //add tx_ref to the paylaod
-         $array['public_key'] = $_ENV['PUBLIC_KEY'];
-         $array['tx_ref'] = $this->payment->txref;
+        //add tx_ref to the paylaod
+        if(!isset($array['tx_ref']) || empty($array['tx_ref'])){
+            $array['tx_ref'] = $this->payment->txref;
+        }
 
 
         if(!in_array($array['type'], $this->type, true)){
@@ -122,18 +124,17 @@ class MobileMoney {
                     
                     break;
             }
-
-
+            
             //set the payment handler 
             $this->payment->eventHandler(new momoEventHandler)
             //set the endpoint for the api call
-            ->setEndPoint("v3/charges?".$this->type);
+            ->setEndPoint("v3/charges?type=".$this->type);
             //returns the value from the results
-            $result = $this->payment->chargePayment($array);
+            return $this->payment->chargePayment($array);
 
             //echo 'Type selected: '.$this->type;
 
-            return $result;
+         
             
         }
 

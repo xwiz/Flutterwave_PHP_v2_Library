@@ -81,16 +81,33 @@ class TokinizedCharge {
     protected $payment;
 
     function __construct(){
-        $this->payment = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->payment = new Rave($_ENV['SECRET_KEY']);
     }
     function tokenCharge($array){
+
+        //add tx_ref to the paylaod
+        if(!isset($array['tx_ref']) || empty($array['tx_ref'])){
+            $array['tx_ref'] = $this->payment->txref;
+        }
+
+        if(gettype($array['amount']) !== "integer"){
+            return '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
+            Amount needs to be an integer.
+          </div>'; 
+        }
+
+        if(!isset($array['token']) || !isset($array['currency']) || !isset($array['country']) || !isset($array['amount']) || !isset($array['email'])){
+            return '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
+            Missing Param in the Payload. Please check you payload.
+          </div>';
+        }
             //set the payment handler 
             $this->payment->eventHandler(new tkEventHandler)
             //set the endpoint for the api call
-            ->setEndPoint("flwv3-pug/getpaidx/api/tokenized/charge");
+            ->setEndPoint("v3/tokenized-charges");
             //returns the value from the results
             //you can choose to store the returned value in a variable and validate within this function
-            return $this->payment->postURL($array);
+            return $this->payment->tokenCharge($array);
           
     }
     
@@ -128,6 +145,12 @@ class TokinizedCharge {
 
          $this->payment->bulkCharges($data);
     }
+
+    function verifyTransaction(){
+        //verify the charge
+        return $this->payment->verifyTransaction($this->payment->txref);//Uncomment this line if you need it
+    }
+
 
        
     

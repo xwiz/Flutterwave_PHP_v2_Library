@@ -81,23 +81,25 @@ class Account {
     protected $payment;
 
     function __construct(){
-        $this->payment = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY']);
+        $this->payment = new Rave($_ENV['SECRET_KEY']);
         $this->type = array('debit_uk_account','debit_ng_account');
         $this->valType = "account";
     }
+    
     function accountCharge($array){
             //set the payment handler 
 
-            //add tx_ref to the paylaod
-        $array['public_key'] = $_ENV['PUBLIC_KEY'];
+    //add tx_ref to the paylaod
+    if(!isset($array['tx_ref']) || empty($array['tx_ref'])){
         $array['tx_ref'] = $this->payment->txref;
+    }
 
 
-        if(!in_array($array['type'], $this->type)){
+    if(!in_array($array['type'], $this->type)){
             echo '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
             The Type specified in the payload  is not <b> "'.$this->type[0].' or '.$this->type[1].'"</b>
           </div>';
-        }
+    }
 
 
             $this->payment->eventHandler(new accountEventHandler);

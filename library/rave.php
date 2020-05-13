@@ -83,8 +83,8 @@ class Rave {
      * */
     function __construct($secretKey,$prefix = 'RV', $overrideRefWithPrefix = false){
         $this->secretKey = $secretKey;
-        $this->public = $_ENV['PUBLIC_KEY'];
-        $this->env = $_ENV['RAVE_ENVIRONMENT'];
+        $this->public = getenv('PUBLIC_KEY');
+        $this->env = getenv('RAVE_ENVIRONMENT');
         $this->transactionPrefix = $overrideRefWithPrefix ? $prefix : $prefix.'_';
         $this->overrideTransactionReference = $overrideRefWithPrefix;
         // create a log channel
@@ -183,15 +183,6 @@ class Rave {
         return $this;
     }
 
-    /**
-     * Sets the transaction amount
-     * @param integer $amount Transaction amount
-     * @return object
-     * */
-    function setAccount($account){
-        $this->account = $account;
-        return $this;
-    }
     /**
      * Sets the transaction amount
      * @param integer $amount Transaction amount
@@ -672,6 +663,16 @@ class Rave {
         return $response->raw_body;    // Unparsed body
      }
 
+
+     function putURL($data){
+        $bearerTkn = 'Bearer '.$this->secretKey;
+        $headers = array('Content-Type' => 'application/json','Authorization'=> $bearerTkn);
+        $body = Body::json($data);
+        $url = $this->baseUrl.'/'.$this->end_point;
+        $response = Request::put($url, $headers, $body);
+        return $reponse->raw_body;
+     }
+
      
      /**
      * makes a get call to the api 
@@ -776,7 +777,7 @@ class Rave {
 
     function bvn($bvn){
         $this->logger->notice('Validating bvn...');
-        $url = "/".$bvn."?seckey=".$this->secretKey;
+        $url = "/".$bvn;
         return $this->getURL($url);
      } 
 
@@ -895,19 +896,17 @@ class Rave {
      * */
 
      function chargePayment($array){
+
+        //remove the type param from the payload
+       
         $this->options = $array;
         
         //For Card which is now a Copliance Approve Issue
         if(in_array('card', $array )){
             $this->json_options = json_encode($this->options);
-        
             $this->logger->notice('Checking payment details..');
-
              //encrypt the required options to pass to the server
             $this->integrityHash = $this->encryption($this->json_options);
-
-            
-            
             $this->post_data = array(
              'public_key' => $this->publicKey,
              'client' => $this->integrityHash,
@@ -930,11 +929,9 @@ class Rave {
 
         }else{
 
-           $result = $this->postURL($this->options);
+           $result = $this->postURL($array);
 
            print_r($result);
-           
-           $this->logger->notice('Payment requires validation..'); 
        // the result returned requires validation
         $result = json_decode($result, true);
 
@@ -1018,26 +1015,31 @@ class Rave {
     function createOrder($array){
         $this->logger->notice('creating Ebill order for customer with email: '.$array['email']); 
 
-        if(empty($data['narration'])){
+        if(empty($array['narration']) || !array_key_exists('narration', $array)){
             $array['narration'] = '';
-        }else if(empty($data['IP'])){
+
+        }
+        if(empty($data['IP'])){
             $array['IP'] = '10.30.205.3';
 
-        }else if(!isset($array['custom_business_name']) || empty($array['custom_business_name'])){
+        } 
+        if(!isset($array['custom_business_name']) || empty($array['custom_business_name'])){
             $array['custom_business_name'] = '';
+        }
+        
+        if(empty($array['number_of_units']) || !array_key_exists('number_of_units', $array)){
+            $array['number_of_units'] = "1";
         }
 
         $data = array(
-            // 'SECKEY' => $array['SECKEY'],
-            'SECKEY' => $this->secretKey,
             'narration' => $array['narration'],
-            'numberofunits' => $array['numberofunits'],
-            'currency' => $array['currency'],
+            'number_of_units' => $array['number_of_units'],
+            'currency' => "NGN",
             'amount' => $array['amount'],
-            'phonenumber' => $array['phonenumber'],
+            'phone_number' => $array['phone_number'],
             'email' => $array['email'],
-            'txRef' => $array['txRef'],
-            'IP' => $array['IP'],
+            'tx_ref' => $array['tx_ref'],
+            'ip' => $array['ip'],
             'country' => $array['country'],
             'custom_business_name' => $array['custom_business_name']
         );
@@ -1054,12 +1056,11 @@ class Rave {
         $this->logger->notice('updating Ebill order..');
         
         $data = array(
-            'reference' => $array['flwRef'],
-            'currency' => 'NGN',
             'amount' => $array['amount'],
+            'currency' => "NGN"// only NGN can be passed
         );
 
-        $result = $this->postURL($data);
+        $result = $this->putURL($data);
         return $result;
     }
 
@@ -1070,88 +1071,94 @@ class Rave {
      * */
 
     function bill($array){
-        $this->logger->notice(' billing ...');
 
-        function startsWith($haystack, $needle)
-            {
-                 $length = strlen($needle);
-                 return (substr($haystack, 0, $length) === $needle);
-            }
-        $data = array();
-        if($array["service"] == 'fly_buy'){
-        $this->logger->notice('fly_buy bill...');
-            $data["service_payload"]["Country"] = $array["service_payload"]["Country"];
-            $data["service_payload"]["CustomerId"] = $array["service_payload"]["CustomerId"];
-            $data["service_payload"]["Reference"] = $array["service_payload"]["Reference"];
-            $data["service_payload"]["Amount"] = $array["service_payload"]["Amount"];
-            $data["service_payload"]["IsAirtime"] = $array["service_payload"]["IsAirtime"];
-            $data["service_payload"]["BillerName"] = $array["service_payload"]["BillerName"];
-      
-        }else if($array["service"] == 'fly_buy_bulk'){
-        $this->logger->notice('fly_buy_bulk bill...');
-
-            $data["service_payload"]["BatchReference"] = $array["service_payload"]["BatchReference"];
-            $data["service_payload"]["CallBackUrl"] = $array["service_payload"]["CallBackUrl"];
-            $data["service_payload"]["Requests"] = $array["service_payload"]["Requests"];//an array
-        }else if($array["service"] == 'fly_history'){
-        $this->logger->notice('fly_history bill...');
-            $data["service_payload"]["FromDate"] = $array["service_payload"]["FromDate"];
-            $data["service_payload"]["ToDate"] = $array["service_payload"]["ToDate"];
-            $data["service_payload"]["PageSize"] = $array["service_payload"]["PageSize"];
-            $data["service_payload"]["PageIndex"] = $array["service_payload"]["PageIndex"];
-            $data["service_payload"]["Reference"] = $array["service_payload"]["Reference"];
-        }else if($array["service"] == 'fly_recurring_cancel'){
-        $this->logger->notice('fly_recurring cancel bill...');
-
-            $data["service_payload"]["CustomerMobile"] = $array["service_payload"]["CustomerMobile"];
-            $data["service_payload"]["RecurringPayment"] = $array["service_payload"]["RecurringPayment"];//Id of the recurring payment to be cancelled.
-        }else if($array["service"] == 'fly_remita_create-order'){
-        $this->logger->notice('fly_remita_create-order...');
-
-            $data["service_payload"]["billercode"] = $array["service_payload"]["billercode"];
-            $data["service_payload"]["productcode"] = $array["service_payload"]["productcode"];
-            $data["service_payload"]["amount"] = $array["service_payload"]["amount"];
-            $data["service_payload"]["transactionreference"] = $array["service_payload"]["transactionreference"];
-            $data["service_payload"]["payer"] = $array["service_payload"]["payer"];
-            $data["service_payload"]["fields"] = $array["service_payload"]["fields"];
-        }else if($array["service"] == 'fly_remita_pay-order'){
-        $this->logger->notice('fly_remita_pay-order...');
-
-            $data["service_payload"]["orderreference"] = $array["service_payload"]["orderreference"];
-            $data["service_payload"]["paymentreference"] = $array["service_payload"]["paymentreference"];
-            $data["service_payload"]["amount"] = $array["service_payload"]["amount"];
+        if(!isset($array['type'])){
+            $error = array('Type'=>'Missing the type property in the payload');
+            return $error;
         }
-
-
         
-            $data["secret_key"] = $this->secretKey;
-            $data["service"] = $array["service"];
-            $data["service_method"] = $array["service_method"];
-            $data["service_version"] = $array["service_version"];
-            $data["service_channel"] = "rave";
-    
-
-
-       
+            $this->logger->notice($array['type'].' Billing ...');
+        
+        $data = array();
+            $data["type"] = $array["type"];
+            $data["country"] = $array["country"];
+            $data["customer"] = $array["customer"];
+            $data["amount"] = $array["amount"];
+            $data["recurrence"] = $array["recurrence"];
+            $data["reference"] = $array["reference"];
             $result = $this->postUrl($data);
+
+
+            $result = json_decode($result, true);
         
 
         return $result;
     }
 
-    function bulkCharges($data){
-        $this->logger->notice('bulk charging...');
-        if(isset($data['title'])){
-        $url = "?seckey=".$this->secretKey."&&title=".$data['title'];
+    function bulkBills($array){
+       $data = $array;
 
-        }elseif(isset($data['batch_id'])){
-            $url = "?SECKEY=".$this->secretKey."&batch_id=".$data['batch_id'];
-        }else{
-        $url = "?seckey=".$this->secretKey;
+       $result = $this->postUrl($data);
+
+       $result = json_decode($result, true);
+
+        return $result;
+     }
+
+    function getBill($array){
+
+        if(array_key_exists('reference', $array) && !array_key_exists('from', $array)){
+            $url = "/".$array['reference'];
+        }else if(array_key_exists('code', $array) && !array_key_exists('customer', $array)){
+            
+            $url = "/".$array['item_code'];
+        }else if(array_key_exists('id', $array) && array_key_exists('product_id', $array)){
+            $url = "/".$array['id']."/products/".$array['product_id'];
+        }else if(array_key_exists('from', $array) && array_key_exists('to', $array)){
+            if(isset($array['page']) && isset($array['reference'])){
+                 $url = '?from='.$array['from'].'&'.$array['to'].'&'.$array['page'].'&'.$array['reference'];    
+            }else{
+                $url = '?from='.$array['from'].'&'.$array['to'];
+                
+            }
+
 
         }
+
         return $this->getURL($url);
-     }
+    }
+
+    function getBillers(){
+        $url = '/billers';
+        return $this->getURL($url);
+    }
+
+    function getBillCategories(){
+        $url = '/bill-categories';
+        return $this->getURL($url);
+
+    }
+
+
+    function tokenCharge($array){
+        $data = $array;
+
+        if(!isset($data['token']) && !isset($data['currency']) &&
+         !isset($data['country']) && !isset($data['amount']) &&
+         !isset($data['tx_ref']) && !isset($data['email'])){
+            $error = array('error'=>'Your payload is missing all properties');
+            return $error;
+        }
+
+       print_r($array);
+
+        $result = $this->postUrl($array);
+
+        $result = json_decode($result, true);
+        
+        return $result;
+
+    }
 
       /**
      * List of all transfers with this method
