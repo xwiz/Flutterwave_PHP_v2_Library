@@ -74,16 +74,58 @@ class subaccountEventHandler implements EventHandlerInterface{
 class Subaccount {
     protected $subaccount;
     function __construct(){
-        $this->subaccount = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->subaccount = new Rave($_ENV['SECRET_KEY']);
     }
-    function subaccount($array){
+    function createSubaccount($array){
             //set the payment handler 
             $this->subaccount->eventHandler(new subaccountEventHandler)
             //set the endpoint for the api call
-            ->setEndPoint("v2/gpx/subaccounts/create");
+            ->setEndPoint("v3/subaccounts");
             //returns the value from the results
             return $this->subaccount->createSubaccount($array);
         }
+    
+    function getSubaccounts(){
+        $this->subaccount->eventHandler(new subaccountEventHandler)
+            //set the endpoint for the api call
+            ->setEndPoint("v3/subaccounts");
+            //returns the value from the results
+            return $this->subaccount->getSubaccounts();
+    }
+
+    function fetchSubaccount($array){
+
+        $this->subaccount->eventHandler(new subaccountEventHandler)
+            //set the endpoint for the api call
+            ->setEndPoint("v3/subaccounts/".$array['id']);
+            //returns the value from the results
+            return $this->subaccount->getSubaccounts();
+
+    }
+
+    function updateSubaccount($array){
+
+            if(!isset($array['id'])){
+                return '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
+                Missing <b> id </b> Parameter in the payload
+              </div>';
+            }
+
+            $this->subaccount->eventHandler(new subaccountEventHandler)
+            //set the endpoint for the api call
+            ->setEndPoint("v3/subaccounts/".$array['id']);
+            //returns the value from the results
+            return $this->subaccount->updateSubaccount($array);
+
+    }
+
+    function deleteSubaccount($array){
+        $this->subaccount->eventHandler(new subaccountEventHandler)
+        //set the endpoint for the api call
+        ->setEndPoint("v3/subaccounts/".$array['id']);
+        //returns the value from the results
+        return $this->subaccount->deleteSubaccount();
+    }
 }
 
 

@@ -87,7 +87,7 @@ class Ussd {
 
 
         if($array['type'] !== $this->type){
-            echo '<div class="alert alert-danger" role="alert">
+            return '<div class="alert alert-danger" role="alert">
             The Type specified in the payload  is not <b> "'.$this->type.'"</b>
           </div>';
         }

@@ -670,7 +670,7 @@ class Rave {
         $body = Body::json($data);
         $url = $this->baseUrl.'/'.$this->end_point;
         $response = Request::put($url, $headers, $body);
-        return $reponse->raw_body;
+        return $response->raw_body;
      }
 
      
@@ -701,14 +701,9 @@ class Rave {
         $this->setEndPoint("v3/transactions");
             $result  = $this->getURL($url);
             $result = json_decode($result,true);
-           
-            
-
-
         return $result;
       
     }
-
 
      /**
      * Validate the transaction to be charged
@@ -755,6 +750,8 @@ class Rave {
         return $result;
 
     }
+
+
 
       /**
      * Get all Settlements
@@ -837,9 +834,41 @@ class Rave {
 
     function createPlan($array){
         $this->logger->notice('Creating Payment Plan...');
-        return $this->postURL($array);
+        $result =  $this->postURL($array);
+        $result = json_decode($result, true);
+        return $result;
      } 
 
+
+    function updatePlan($array){
+        $this->logger->notice('Updating Payment Plan...');
+
+        $result =  $this->putURL($array);
+        $result = json_decode($result, true);
+        return $result;
+    }
+
+    function cancelPlan($array){
+        $this->logger->notice('Canceling Payment Plan...');
+        
+        $result =  $this->putURL($array);
+        $result = json_decode($result, true);
+        return $result;
+    }
+
+    function getPlans(){
+        $url = "";
+        $result =  $this->getURL($url);
+        $result = json_decode($result, true);
+        return $result;
+    }
+
+    function get_a_Plan(){
+        $url = "";
+        $result =  $this->getURL($url);
+        $result = json_decode($result, true);
+        return $result;
+    }
        /**
      * Creating a beneficiaries
      *  @param array
@@ -928,10 +957,7 @@ class Rave {
         return $result;
 
         }else{
-
-           $result = $this->postURL($array);
-
-           print_r($result);
+            $result  = $this->postURL($array);
        // the result returned requires validation
         $result = json_decode($result, true);
 
@@ -966,9 +992,23 @@ class Rave {
         //decode the response 
         $result = json_decode($result, true);
         //return result
-        print_r($result);
+        return $result;
        // return $result;
-     }   
+     } 
+     
+     function vcGetRequest(){
+         $url = "";
+        $result =  $this->getURL($url);
+        $result = json_decode($result, true);
+        return $result;
+     }
+     
+
+     function vcPutRequest($array = array()){
+        $result =  $this->putURL($array);
+        $result = json_decode($result, true);
+        return $result;
+     }
     /**
          * Used to create sub account on the rave dashboard
          *  @param array
@@ -979,6 +1019,32 @@ class Rave {
         $this->logger->notice('Creating Sub account...');
         //pass $this->options to the postURL function to call the api
         $result  = $this->postURL($this->options);
+        $result = json_decode($result, true);
+        return $result;
+     }
+
+     function getSubaccounts(){
+        $url = "";
+        //pass $this->options to the postURL function to call the api
+        $result  = $this->getURL($url);
+        $result = json_decode($result, true);
+        return $result;
+     }
+
+     function updateSubaccount($array){
+        $this->options = $array;
+        $this->logger->notice('updating Sub account...');
+        //pass $this->options to the postURL function to call the api
+        $result  = $this->putURL($this->options);
+        $result = json_decode($result, true);
+        return $result;
+     }
+
+     function deleteSubaccount($array = array()){
+        $this->logger->notice('deleting  Sub account...');
+        //pass $this->options to the postURL function to call the api
+        $result  = $this->putURL($array);
+        $result = json_decode($result, true);
         return $result;
      }
 
@@ -1044,6 +1110,7 @@ class Rave {
             'custom_business_name' => $array['custom_business_name']
         );
         $result = $this->postURL($data);
+        $result = json_decode($result, true);
         return $result;
     }
 
@@ -1060,7 +1127,9 @@ class Rave {
             'currency' => "NGN"// only NGN can be passed
         );
 
+
         $result = $this->putURL($data);
+        $result = json_decode($result, true);
         return $result;
     }
 

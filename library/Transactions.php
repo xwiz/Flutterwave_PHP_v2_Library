@@ -74,15 +74,50 @@ class transactionVerificationEventHandler implements EventHandlerInterface{
 }
 class Transactions{
     function __construct(){
-        $this->history = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->history = new Rave($_ENV['SECRET_KEY']);
     }
     function viewTransactions($array){
         //set the payment handler 
         $this->history->eventHandler(new transactionVerificationEventHandler)
         //set the endpoint for the api call
-        ->setEndPoint("v2/gpx/transactions/query");
+        ->setEndPoint("v3/transactions");
         //returns the value from the results
         return $this->history->getAllTransactions($array);
     }
 
+    function getTransactionFee($array){
+        
+
+        $this->history->eventHandler(new transactionVerificationEventHandler)
+        //set the endpoint for the api call
+        ->setEndPoint("v3/transactions/fee");
+        //returns the value from the results
+        return $this->history->getTransactionFee($array);
+    }
+
+    function verifyTransaction(){
+
+            $array['tx_ref'] = $this->history->txref;
+        
+        $this->history->eventHandler(new transactionVerificationEventHandler)
+        //set the endpoint for the api call
+        ->setEndPoint("v3/transactions/".$array['tx_ref']."/verify");
+        //returns the value from the results
+        return $this->history->verifyTransaction();
+    }
+
+
+    function viewTimeline($array){
+        if(!isset($array['id'])){
+            return '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
+            Missing value for <b> id </b> in your payload
+          </div>';
+        }        
+
+        $this->history->eventHandler(new transactionVerificationEventHandler)
+        //set the endpoint for the api call
+        ->setEndPoint("v3/transactions/".$array['id']."/events");
+        //returns the value from the results
+        return $this->history->transactionTImeline();
+    }
 }

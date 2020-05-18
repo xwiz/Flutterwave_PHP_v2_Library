@@ -93,7 +93,7 @@ class Mpesa {
 
         
         if($array['type'] !== $this->type){
-            echo '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
+            return '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
             The Type specified in the payload  is not <b> "'.$this->type.'"</b>
           </div>';
         }

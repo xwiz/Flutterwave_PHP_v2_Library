@@ -21,7 +21,7 @@ class Preauth {
         //set the payment handler 
         $this->payment->eventHandler(new accountEventHandler)
         //set the endpoint for the api call
-        ->setEndPoint("flwv3-pug/getpaidx/api/charge");
+        ->setEndPoint("");
         //returns the value from the results
         //you can choose to store the returned value in a variable and validate within this function
         $this->payment->setAuthModel("AUTH");

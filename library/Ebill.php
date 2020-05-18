@@ -82,8 +82,8 @@ class Ebill {
 
         if(!isset($array['amount']) || !isset($array['phone_number']) || 
         !isset($array['email']) || !isset($array['country']) || !isset($array['ip'])){
-            echo '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
-            All of the params should contain values <b> "'.$this->keys[0].' , '.$this->keys[1].' , '.$this->keys[2].' , '.$this->keys[3].' and '.$this->keys[4].'"</b>
+            return '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
+            Missing values for one of the following body params: <b> "'.$this->keys[0].' , '.$this->keys[1].' , '.$this->keys[2].' , '.$this->keys[3].' and '.$this->keys[4].'"</b>
           </div>';
         }
 
@@ -98,17 +98,22 @@ class Ebill {
     function updateOrder($data){
         
 
-        if(!isset($array['amount'])){
-            echo '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
-            All of the params should contain values <b> "'.$this->keys[0].'and reference'.'"</b>
+        if(!isset($data['amount'])){
+            return '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
+         Missing values for one of the following body params: <b> "'.$this->keys[0].' '.'and reference'.'"</b>
           </div>';
         }
 
+        if(gettype($data['amount']) !== 'integer'){
+            $data['amount'] = (int) $data['amount'];
+        }
+        
+
        $this->eb->eventHandler(new ebillEventHandler)
         //set the endpoint for the api call
-        ->setEndPoint("v3/ebills/".$array['reference']);
+        ->setEndPoint("v3/ebills/".$data['reference']);
         //returns the value of the result.
-       return $this->eb->updateOrder($array); 
+       return $this->eb->updateOrder($data); 
     }
 }
 

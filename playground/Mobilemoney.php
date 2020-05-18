@@ -5,7 +5,7 @@ require("../library/MobileMoney.php");
 use Flutterwave\MobileMoney;
 //The data variable holds the payload
 $data = array(
-    "order_id" => "USS_URG_8923s2323",
+    "order_id" => "USS_URG_89245453s2323",
     "amount" => "1500",
     "type" => "mobile_money_rwanda",// could be mobile_money_rwanda,mobile_money_uganda, mobile_money_zambia, mobile_money_ghana
     "currency" => "RWF",
