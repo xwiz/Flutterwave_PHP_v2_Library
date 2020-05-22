@@ -86,6 +86,7 @@ class Subaccount {
         }
     
     function getSubaccounts(){
+        
         $this->subaccount->eventHandler(new subaccountEventHandler)
             //set the endpoint for the api call
             ->setEndPoint("v3/subaccounts");
@@ -99,7 +100,7 @@ class Subaccount {
             //set the endpoint for the api call
             ->setEndPoint("v3/subaccounts/".$array['id']);
             //returns the value from the results
-            return $this->subaccount->getSubaccounts();
+            return $this->subaccount->fetchSubaccount();
 
     }
 

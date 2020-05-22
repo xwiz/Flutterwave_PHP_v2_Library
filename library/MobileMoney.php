@@ -82,7 +82,7 @@ class momoEventHandler implements EventHandlerInterface{
 class MobileMoney {
     protected $payment;
     function __construct(){
-        $this->payment = new Rave($_ENV['SECRET_KEY'],"Trn");
+        $this->payment = new Rave($_ENV['SECRET_KEY']);
         $this->type = array("mobile_money_ghana","mobile_money_uganda","mobile_money_zambia","mobile_money_rwanda");
     }
     function mobilemoney($array){

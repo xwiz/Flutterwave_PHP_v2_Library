@@ -83,7 +83,7 @@ class Rave {
      * */
     function __construct($secretKey,$prefix = 'RV', $overrideRefWithPrefix = false){
         $this->secretKey = $secretKey;
-        $this->public = getenv('PUBLIC_KEY');
+        $this->publicKey = getenv('PUBLIC_KEY');
         $this->env = getenv('RAVE_ENVIRONMENT');
         $this->transactionPrefix = $overrideRefWithPrefix ? $prefix : $prefix.'_';
         $this->overrideTransactionReference = $overrideRefWithPrefix;
@@ -743,14 +743,27 @@ class Rave {
      *  @return object
      * */
 
-    function getAllTransactions($array){
-
+    function getAllTransactions(){
         $this->logger->notice('Getting all Transactions...');
-        $result = $this->postURL($array);
-        return $result;
+        $url = "";
+        $result = $this->getURL($url);
+        return json_decode($result, true);
 
     }
 
+    function getTransactionFee(){
+            $url = "";
+            $result = $this->getURL($url);
+            return json_decode($result, true);
+
+    }
+
+    function transactionTimeline(){
+        $url = "";
+        $result = $this->getURL($url);
+        return json_decode($result,true);
+
+    }
 
 
       /**
@@ -761,9 +774,9 @@ class Rave {
     function getAllSettlements(){
 
         $this->logger->notice('Getting all Subscription...');
-        $url = "?seckey=".$this->secretKey;
-        return $this->getURL($url);
-
+        $url = "";
+        $result =  $this->getURL($url);
+        return json_decode($result,true);
     }
 
      /**
@@ -797,7 +810,7 @@ class Rave {
 
     function fetchASubscription($data){
         $this->logger->notice('Fetching a Subscription...');
-        $url = "?seckey=".$this->secretKey."&transaction_id=".$data['transaction_id'];
+        $url = "?transaction_id=".$data['transaction_id'];
         return $this->getURL($url);
      }
      
@@ -870,16 +883,27 @@ class Rave {
         return $result;
     }
        /**
-     * Creating a beneficiaries
+     * Creating a beneficiary
      *  @param array
      *  @return object
      * */
 
-    function beneficiary($array){
+    function createBeneficiary($array){
         $this->logger->notice('Creating beneficiaries ...');
         return $this->postURL($array);
      }
 
+      /**
+     * get  beneficiaries
+     *  @param array
+     *  @return object
+     * */
+
+
+    function  getBeneficiaries(){
+        $url = "";
+        $this->getURL($url);
+    }
      /**
      * transfer payment api 
      *  @param array
@@ -1031,6 +1055,14 @@ class Rave {
         return $result;
      }
 
+     function fetchSubaccount(){
+        $url = "";
+        //pass $this->options to the postURL function to call the api
+        $result  = $this->getURL($url);
+        $result = json_decode($result, true);
+        return $result;
+     }
+
      function updateSubaccount($array){
         $this->options = $array;
         $this->logger->notice('updating Sub account...');
@@ -1062,14 +1094,40 @@ class Rave {
         return $this;
     }
 
-/**
- * This is used to create virtual account for a merchant.
- */
+    /**
+     * This is used to create virtual account for a merchant.
+     * @param string $array
+     * @return object
+     */
     function createVirtualAccount($array){
         $this->options = $array;
         $this->logger->notice('creating virtual account..'); 
         $result = $this->postURL($this->options);
         return $result;
+    }
+
+     /**
+     * Create bulk virtual accounts with this method
+     * @param string $array
+     * @return object
+     * */
+
+    function createBulkAccounts($array){
+        $this->options = $array;
+        $this->logger->notice('creating bulk virtual account..'); 
+        $result = $this->postURL($this->options);
+        return $result;
+    }
+
+
+     /**
+     * Get  bulk virtual virtual cards method
+     * @return object
+     * */
+
+    function getBulkAccounts(){
+        $url = "";
+        $this->getURL($url);
     }
 
      /**
@@ -1238,30 +1296,18 @@ class Rave {
      function listTransfers($data){
         $this->logger->notice('Fetching list of transfers...');
         if(isset($data['page'])){
-        $url = "?seckey=".$this->secretKey."&page=".$data['page'];
+        $url = "?page=".$data['page'];
 
         }else if(isset($data['page']) && isset($data['status'])){
-            $url = "?seckey=".$this->secretKey."&page".$data['page']."&status".$data['status'];
+            $url = "?page".$data['page']."&status".$data['status'];
         }else if(isset($data['status'])){
-        $url = "?seckey=".$this->secretKey."&status=".$data['status'];
+        $url = "?status=".$data['status'];
 
         }else{
-            $url = "?seckey=".$this->secretKey;
+
+            $url = "";
 
         }
-        return $this->getURL($url);
-     }
-
-      /**
-     * Fetch a transfer and its details with this method
-     * @param string $data
-     * @return object
-     * */
-
-     function fetchATransfer($data){
-        $this->logger->notice('Fetching a transfer and its details...');
-        $url = "?seckey=".$this->secretKey;
-
         return $this->getURL($url);
      }
 
@@ -1274,7 +1320,7 @@ class Rave {
      function bulkTransferStatus($data){
 
         $this->logger->notice('Checking bulk transfer status...');
-        $url = "?seckey=".$this->secretKey."&batch_id=".$data['batch_id'];
+        $url = "?batch_id=".$data['batch_id'];
         return $this->getURL($url);
      }
 
@@ -1287,7 +1333,7 @@ class Rave {
      function applicableFees($data){
 
         $this->logger->notice('Fetching applicable fees...');
-        $url = "?seckey=".$this->secretKey."&currency=".$data['currency']."&amount=".$data['amount'];
+        $url = "?currency=".$data['currency']."&amount=".$data['amount'];
         return $this->getURL($url);
      }
 
@@ -1303,7 +1349,6 @@ class Rave {
             $array['currency'] == 'NGN';
         }
         $data = array(
-            "seckey"=>$this->secretKey,
             "currency" => $array['currency']
         );
         return $this->postURL($data);
@@ -1318,17 +1363,9 @@ class Rave {
      function verifyAccount($array){
 
         $this->logger->notice('Verifying transfer recipents account...');
-        if(empty($array['currency']) && empty($array['country'])){
-            $array['currency'] == '';
-            $array['country'] == '';
-        }
-
         $data = array(
-            "recipientaccount"=> $array['recipientaccount'],
-            "destbankcode"=> $array['destbankcode'],
-            "currency" => $array['currency'],
-            "country" => $array['country']
-            
+            "account_number"=> $array['account_number'],
+            "account_bank"=> $array['account_bank']   
         );
         return $this->postURL($data);
 
@@ -1357,7 +1394,6 @@ class Rave {
      function captureFunds($array){
         $this->logger->notice('capturing funds for flwRef: '.$array['flwRef'].' ...');
         $data = array(
-            "seckey"=> $this->secretkey,
             "flwRef"=> $array['flwRef'],
             "amount"=> $array['amount']
             

@@ -76,16 +76,22 @@ class Transactions{
     function __construct(){
         $this->history = new Rave($_ENV['SECRET_KEY']);
     }
-    function viewTransactions($array){
+    function viewTransactions(){
         //set the payment handler 
         $this->history->eventHandler(new transactionVerificationEventHandler)
         //set the endpoint for the api call
         ->setEndPoint("v3/transactions");
         //returns the value from the results
-        return $this->history->getAllTransactions($array);
+        return $this->history->getAllTransactions();
     }
 
-    function getTransactionFee($array){
+    function getTransactionFee($array = array()){
+
+        if(!isset($array['amount'])){
+            return '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
+            The following query param  is required <b>  amount </b>
+          </div>';
+        }
         
 
         $this->history->eventHandler(new transactionVerificationEventHandler)
@@ -107,7 +113,7 @@ class Transactions{
     }
 
 
-    function viewTimeline($array){
+    function viewTimeline($array = array()){
         if(!isset($array['id'])){
             return '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
             Missing value for <b> id </b> in your payload
@@ -118,6 +124,6 @@ class Transactions{
         //set the endpoint for the api call
         ->setEndPoint("v3/transactions/".$array['id']."/events");
         //returns the value from the results
-        return $this->history->transactionTImeline();
+        return $this->history->transactionTimeline();
     }
 }

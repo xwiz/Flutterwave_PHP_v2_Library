@@ -78,7 +78,7 @@ class Settlement {
         //set the payment handler 
         $this->subscription->eventHandler(new settlementEventHandler)
         //set the endpoint for the api call
-        ->setEndPoint("v2/merchant/settlements/".$array['id']);
+        ->setEndPoint("v3/settlements/".$array['id']);
         //returns the value from the results
         return $this->settle->fetchASettlement();
 
@@ -88,7 +88,7 @@ class Settlement {
         //set the payment handler 
         $this->settle->eventHandler(new settlementEventHandler)
         //set the endpoint for the api call
-        ->setEndPoint("v2/merchant/settlements");
+        ->setEndPoint("v3/settlements");
         //returns the value from the results
         return $this->settle->getAllSettlements();
 

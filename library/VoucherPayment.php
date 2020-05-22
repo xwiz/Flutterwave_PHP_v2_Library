@@ -76,27 +76,31 @@ class voucherEventHandler implements EventHandlerInterface{
 
 class VoucherPayment {
     function __construct(){
-        $this->payment = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY']);
+        $this->payment = new Rave($_ENV['SECRET_KEY']);
         $this->type = "voucher_payment";
     }
 
     function voucher($array){
 
+        
         //add tx_ref to the paylaod
-        $array['public_key'] = $_ENV['PUBLIC_KEY'];
-        $array['tx_ref'] = $this->payment->txref;
+        if(!isset($array['tx_ref']) || empty($array['tx_ref'])){
+            $array['tx_ref'] = $this->payment->txref;
+        }
 
         if($array['type'] !== $this->type){
             echo '<div class="alert alert-danger" role="alert">
             The Type specified in the payload  is not <b> "'.$this->type.'"</b>
           </div>';
+        }else{
+            $this->payment->eventHandler(new voucherEventHandler)
+            //set the endpoint for the api call
+            ->setEndPoint("v3/charges?type=".$this->type);
+            //returns the value from the results
+            return $this->payment->chargePayment($array);
         }
-        //set the payment handler 
-        $this->payment->eventHandler(new voucherEventHandler)
-        //set the endpoint for the api call
-        ->setEndPoint("v3/charges?type=".$this->type);
-        //returns the value from the results
-        return $this->payment->chargePayment($array);
+        
+       
     }
 
      /**you will need to verify the charge

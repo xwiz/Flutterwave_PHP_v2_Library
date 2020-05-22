@@ -5,32 +5,38 @@ require("../library/Transactions.php");
 use Flutterwave\Transactions;
 //The data variable holds the payload
 $data = array(
-    
+'amount'=> 1000
+);
+$fetch_data = array(
+'id'=>'345522'
+);
+$time_data = array(
+  'id'=>'3434'
 );
 
 $history = new Transactions();
-$transactions = $history->viewTransactions($data);
-$transactionfee = $history->getTransactionFee();
+$transactions = $history->viewTransactions();
+$transactionfee = $history->getTransactionFee($data);
 $verifyTransaction = $history->verifyTransaction($fetch_data);
-$timeline = $history->viewTimeline($update_data);
+$timeline = $history->viewTimeline($time_data);
 
 echo '<div class="alert alert-success role="alert">
-        <h1>Subaccount Creation Result: </h1>
+        <h1> Get Transactions Result: </h1>
         <p><b> '.print_r($transactions, true).'</b></p>
       </div>';
 
 echo '<div class="alert alert-primary role="alert">
-        <h1>[Get Subaccounts] Result: </h1>
+        <h1>[Get transaction fee] Result: </h1>
         <p><b> '.print_r($transactionfee, true).'</b></p>
       </div>';
 
 echo '<div class="alert alert-primary role="alert">
-      <h1>[Get Subaccounts] Result: </h1>
+      <h1>[Verify Transaction] Result: </h1>
       <p><b> '.print_r($verifyTransaction, true).'</b></p>
     </div>';
 
 echo '<div class="alert alert-primary role="alert">
-    <h1>[Get Subaccounts] Result: </h1>
+    <h1>[Get Timeline] Result: </h1>
     <p><b> '.print_r($timeline, true).'</b></p>
   </div>';
 

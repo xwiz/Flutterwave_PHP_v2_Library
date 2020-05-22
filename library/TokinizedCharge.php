@@ -151,7 +151,7 @@ class TokinizedCharge {
         return $this->payment->verifyTransaction($this->payment->txref);//Uncomment this line if you need it
     }
 
-
+    
        
     
     }

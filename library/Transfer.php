@@ -75,14 +75,14 @@ class transferEventHandler implements EventHandlerInterface{
 class Transfer {
     protected $transfer;
     function __construct(){
-        $this->transfer = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->transfer = new Rave($_ENV['SECRET_KEY']);
     }
     //initiating a single transfer
     function singleTransfer($array){
         //set the payment handler 
         $this->transfer->eventHandler(new transferEventHandler)
         //set the endpoint for the api call
-        ->setEndPoint("v2/gpx/transfers/create");
+        ->setEndPoint("");
         //returns the value from the results
         return $this->transfer->transferSingle($array);
     }
@@ -92,7 +92,7 @@ class Transfer {
         //set the payment handler 
         $this->transfer->eventHandler(new transferEventHandler)
         //set the endpoint for the api call
-        ->setEndPoint("v2/gpx/transfers/create_bulk");
+        ->setEndPoint("v3/bulk-transfers");
         //returns the value from the results
         return $this->transfer->transferBulk($array);
     }
@@ -102,19 +102,9 @@ class Transfer {
         //set the payment handler 
         $this->transfer->eventHandler(new transferEventHandler)
         //set the endpoint for the api call
-        ->setEndPoint("v2/gpx/transfers");
+        ->setEndPoint("v3/transfers");
 
         return $this->transfer->listTransfers($array);
-    }
-
-    function fetchATransfer($array){
-
-        //set the payment handler 
-        $this->transfer->eventHandler(new transferEventHandler)
-        //set the endpoint for the api call
-        ->setEndPoint("v2/gpx/transfers");
-
-        return $this->transfer->fetchATransfer($array);
     }
 
     function bulkTransferStatus(){
@@ -122,7 +112,7 @@ class Transfer {
          //set the payment handler 
          $this->transfer->eventHandler(new transferEventHandler)
          //set the endpoint for the api call
-         ->setEndPoint("v2/gpx/transfers");
+         ->setEndPoint("v3/bulk-transfers");
 
          return $this->transfer->bulkTransferStatus($array);
     }
@@ -131,37 +121,12 @@ class Transfer {
          //set the payment handler 
          $this->transfer->eventHandler(new transferEventHandler)
          //set the endpoint for the api call
-         ->setEndPoint("v2/gpx/transfers/fee");
+         ->setEndPoint("v3/transfers/fee");
 
          return $this->transfer->applicableFees($array);
     }
 
-    function getTransferBalance($array){
 
-        //set the payment handler 
-        $this->transfer->eventHandler(new transferEventHandler)
-        //set the endpoint for the api call
-        ->setEndPoint("v2/gpx/balance");
-
-        if(!isset($array['currency'])){
-            $array['currency'] = 'NGN';
-        }
-
-        return $this->transfer->getTransferBalance($array);
-
-    }
-
-    function verifyAccount($array){
-
-        //set the payment handler 
-        $this->transfer->eventHandler(new transferEventHandler)
-        //set the endpoint for the api call
-        ->setEndPoint("flwv3-pug/getpaidx/api/resolve_account");
-
-
-        return $this->transfer->verifyAccount($array);
-
-    }
 
     function getBanksForTransfer($data = array("country" => 'NG')){
         

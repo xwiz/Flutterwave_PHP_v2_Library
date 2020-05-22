@@ -76,7 +76,7 @@ class TransactionVerification {
     protected $validate;
 
     function __construct(){
-        $this->validate = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->validate = new Rave($_ENV['SECRET_KEY']);
     }
     function transactionVerify($txref){
             //set the payment handler 
