@@ -87,14 +87,16 @@ class VirtualAccount{
             return '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
             The following body params are required:  <b> email, duration, frequency, or amount </b>
           </div>';
-        }else{
+        }
+
+
             $this->va->eventHandler(new virtualAccountEventHandler)
         //set the endpoint for the api call
         ->setEndPoint("v3/virtual-account-numbers");
         
         //returns the value of the result.
        return $this->va->createVirtualAccount($userdata);
-        }
+        
 
         
     }
@@ -109,11 +111,11 @@ class VirtualAccount{
     }
 
     function getBulkAccounts($array){
-        if(!sset($array['batch_id'])){
+        if(!isset($array['batch_id'])){
         return '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
         The following body params are required:  <b> batch_id </b>
       </div>';
-    }else{
+    }
 
         $this->va->eventHandler(new virtualAccountEventHandler)
         //set the endpoint for the api call
@@ -121,29 +123,26 @@ class VirtualAccount{
         
         //returns the value of the result.
        return $this->va->getBulkAccounts($array);
-    }
+    
 
        
     }
 
     function getAccountNumber($array){
 
-        if(!sset($array['order_ref'])){
+        if(!isset($array['order_ref'])){
             return '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
             The following body params are required:  <b> order_ref </b>
           </div>';
-        }else{
+        }
+
             $this->va->eventHandler(new virtualAccountEventHandler)
         //set the endpoint for the api call
         ->setEndPoint("v3/virtual-account-numbers/". $array['order_ref']);
         
         //returns the value of the result.
-       return $this->va->getBulkAccounts($array);
-
-        }
-        
-
-        
+       return $this->va->getvAccountsNum();
+  
     }
 
    

@@ -45,7 +45,7 @@ if($postData['ref']){
     $overrideRef = true;
 }
 
-$payment = new Rave($_SESSION['publicKey'], $_SESSION['secretKey'], $prefix, $overrideRef, $_SESSION['env']);
+$payment = new Rave($_SESSION['secretKey'], $prefix, $overrideRef);
 
 function getURL($url,$data = array()){
     $urlArr = explode('?',$url);

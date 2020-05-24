@@ -8,36 +8,36 @@ require("../library/Transfer.php");
 use Flutterwave\Transfer;
 //sample payload for payBill()
 $data = array(
-    "country"=> "NG",
-	"customer"=> "+23490803840303",
-	"amount"=> 500,
-	"recurrence"=> "ONCE",
-	"type"=> "AIRTIME",
-	"reference"=> "9300049645534545454332433"
+    "account_bank"=> "044",
+    "account_number"=> "0690000040",
+    "amount"=> 5500,
+    "narration"=> "Akhlm Pstmn Trnsfr xx007",
+    "currency"=> "NGN",
+    "reference"=> "akhlm-pstmnpyt-rfxx007_PMCKDU_1",// read the docs about testing successful and failed transaction.
+    "callback_url"=> "https://webhook.site/b3e505b0-fe02-430e-a538-22bbbce8ce0d",
+    "debit_currency"=> "NGN"
 );
 
 //sample payload for bulkBill()
 $bulkdata = array(
-    "bulk_reference"=>"edf-12de5223d2f3243474543",
-    "callback_url"=>"https://webhook.site/96374895-154d-4aa0-99b5-709a0a128674",
-    "bulk_data"=> array(
-        array(
-        "country"=> "NG",
-        "customer"=> "+23490803840303",
-        "amount"=> 500,
-        "recurrence"=> "WEEKLY",
-        "type"=> "AIRTIME",
-        "reference"=>"930049200929"
-        ),
-        array(
-        "country"=>"NG",
-        "customer"=> "+23490803840304",
-        "amount"=> 500,
-        "recurrence"=> "WEEKLY",
-        "type"=>"AIRTIME",
-        "reference"=>"930004912332434232"
-        )
-    ),
+  "title"=> "Staff salary",
+  "bulk_data"=> array(
+      array(
+          "bank_code"=> "044",
+          "account_number"=> "0690000032",
+          "amount"=> 45000,
+          "currency"=> "NGN",
+          "narration"=> "akhlm blktrnsfr",
+          "reference"=> "akhlm-blktrnsfr-xx03"
+      ),
+      array(
+          "bank_code"=> "044",
+          "account_number"=> "0690000034",
+          "amount"=> 5000,
+          "currency"=> "NGN",
+          "narration"=> "akhlm blktrnsfr",
+          "reference"=> "akhlm-blktrnsfr-xy03"
+      ))
 );
 
 $getdata = array(
@@ -46,43 +46,47 @@ $getdata = array(
      "product_id"=>"OT150"
 );
 
+$listdata = array(
+  'status'=>'failed'
+);
+
+$feedata = array(
+'currency'=> 'NGN', //if currency is omitted. the default currency of NGN would be used.
+'amount'=> 1000
+);
+
 $payment = new Transfer();
 $result = $payment->singleTransfer($data);//initiate single transfer payment
-
-$createBulkTranfer = $payment->bulkTransfer($getdata);// get bulk result....
-$transfers = $payment->listTransfers();
-$bulkTransferStatus = $payment->bulkTransferStatus();
-$bulkTransferStatus = $payment->getApplicableFees();
-// $verify = $payment->verifyTransaction();
+$createBulkTransfer = $payment->bulkTransfer($bulkdata);// get bulk result....
+$transfers = $payment->listTransfers($listdata);//you can add a payload for the page. you can remove the array if want to get it all.
+$getTransferFee = $payment->getTransferFee($feedata);
+$verify = $payment->verifyTransaction();
 echo '<div class="alert alert-success role="alert">
-        <h1> Successful Bill creation Result: </h1>
+        <h1> Transfer Initiation Result: </h1>
         <p><b> '.print_r($result, true).'</b></p>
       </div>';
 
 echo '<div class="alert alert-success role="alert">
-        <h1> Successful Bulk Bill creation Result: </h1>
-        <p><b> '.print_r($bulkresult, true).'</b></p>
+        <h1> Bulk Transfer creation Result: </h1>
+        <p><b> '.print_r($createBulkTransfer, true).'</b></p>
       </div>';
 
 echo '<div class="alert alert-success role="alert">
-      <h1> Successful [GET] Billing Result: </h1>
-      <p><b> '.print_r($getresult, true).'</b></p>
+      <h1> Successful [GET Transfer History : </h1>
+      <p><b> '.print_r($transfers, true).'</b></p>
     </div>';
 
-echo '<div class="alert alert-success role="alert">
-    <h1> Successful [GET Agencies] Billing Result: </h1>
-    <p><b> '.print_r($getAgencies, true).'</b></p>
-  </div>';
+
 
 echo '<div class="alert alert-success role="alert">
   <h1> Successful [GET bill categories] Billing Result: </h1>
-  <p><b> '.print_r($getBillCategories, true).'</b></p>
+  <p><b> '.print_r($getTransferFee, true).'</b></p>
 </div>';
 
-    // echo '<div class="alert alert-primary role="alert">
-//         <h1>Verified Result: </h1>
-//         <p><b> '.print_r($verify, true).'</b></p>
-//       </div>';
+    echo '<div class="alert alert-primary role="alert">
+        <h1>Verified Result: </h1>
+        <p><b> '.print_r($verify, true).'</b></p>
+      </div>';
 
 
 

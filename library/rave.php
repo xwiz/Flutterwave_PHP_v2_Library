@@ -673,6 +673,15 @@ class Rave {
         return $response->raw_body;
      }
 
+     function delURL($url){
+        $bearerTkn = 'Bearer '.$this->secretKey;
+        $headers = array('Content-Type' => 'application/json','Authorization'=> $bearerTkn);
+        //$body = Body::json($data);
+        $path = $this->baseUrl.'/'.$this->end_point;
+        $response = Request::delete($path.$url, $headers);
+        return $response->raw_body; 
+     }
+
      
      /**
      * makes a get call to the api 
@@ -714,10 +723,12 @@ class Rave {
 
         
                 $this->logger->notice('Validating otp...');
-                $this->setEndPoint("v3/charges/".$this->flwRef."/validate");
+                $this->setEndPoint("v3/validate-charge");
                 $this->post_data = array(
                     'type' => $type,//type can be card or account
-                    'otp' => $otp);
+                    'otp' => $otp,
+                    'flw_ref' => $this->flwRef
+                );
                 $result  = $this->postURL($this->post_data);
                 return $result;
 
@@ -776,7 +787,7 @@ class Rave {
         $this->logger->notice('Getting all Subscription...');
         $url = "";
         $result =  $this->getURL($url);
-        return json_decode($result,true);
+        return json_decode($result, true);
     }
 
      /**
@@ -788,7 +799,7 @@ class Rave {
     function bvn($bvn){
         $this->logger->notice('Validating bvn...');
         $url = "/".$bvn;
-        return $this->getURL($url);
+        return json_decode($this->getURL($url), true);
      } 
 
      /**
@@ -798,8 +809,8 @@ class Rave {
 
     function getAllSubscription(){
         $this->logger->notice('Getting all Subscription...');
-        $url = "?seckey=".$this->secretKey;
-        return $this->getURL($url);
+        $url = '';
+        return json_decode($this->getURL($url), true);
      } 
 
         /**
@@ -808,10 +819,11 @@ class Rave {
      *  @return object
      * */
 
-    function fetchASubscription($data){
-        $this->logger->notice('Fetching a Subscription...');
-        $url = "?transaction_id=".$data['transaction_id'];
-        return $this->getURL($url);
+    function cancelSubscription(){
+        $this->logger->notice('Canceling Subscription...');
+        $data = array();
+        $result =  $this->putURL($data);
+        return json_decode($result, true);
      }
      
         /**
@@ -833,10 +845,8 @@ class Rave {
 
     function activateSubscription(){
         $this->logger->notice('Activating Subscription...');
-        $data = array(
-            "seckey"=>$this->secretKey
-        );
-        return $this->postURL($data);
+        $data = array();
+        return $this->putURL($data);
      } 
 
       /**
@@ -890,7 +900,9 @@ class Rave {
 
     function createBeneficiary($array){
         $this->logger->notice('Creating beneficiaries ...');
-        return $this->postURL($array);
+        $result =  $this->postURL($array);
+        $result = json_decode($result, true);
+        return $result;
      }
 
       /**
@@ -902,7 +914,9 @@ class Rave {
 
     function  getBeneficiaries(){
         $url = "";
-        $this->getURL($url);
+        $result =  $this->getURL($url);
+        $result = json_decode($result, true);
+        return $result;
     }
      /**
      * transfer payment api 
@@ -912,8 +926,18 @@ class Rave {
 
      function transferSingle($array){
         $this->logger->notice('Processing transfer...');
-         return $this->postURL($array);
+        $result =  $this->postURL($array);
+        $result = json_decode($result, true);
+        return $result;
          
+     }
+
+
+     function deleteBeneficiary(){
+        $url = "";
+        $result =  $this->delURL($url);
+        $result = json_decode($result, true);
+        return $result;
      }
 
 
@@ -925,7 +949,9 @@ class Rave {
 
     function transferBulk($array){
         $this->logger->notice('Processing bulk transfer...');
-         return $this->postURL($array);
+        $result =  $this->postURL($array);
+        $result = json_decode($result, true);
+        return $result;
          
      }
 
@@ -937,7 +963,9 @@ class Rave {
 
     function refund($array){
         $this->logger->notice('Initiating a refund...');
-         return $this->postURL($array);
+        $result =  $this->postURL($array);
+        $result = json_decode($result, true);
+        return $result;
          
      }
 
@@ -1127,7 +1155,8 @@ class Rave {
 
     function getBulkAccounts(){
         $url = "";
-        $this->getURL($url);
+        $result = $this->getURL($url);
+        return json_decode($result, true);
     }
 
      /**
@@ -1295,20 +1324,25 @@ class Rave {
 
      function listTransfers($data){
         $this->logger->notice('Fetching list of transfers...');
+
         if(isset($data['page'])){
         $url = "?page=".$data['page'];
+        return json_decode($this->getURL($url), true);
 
         }else if(isset($data['page']) && isset($data['status'])){
             $url = "?page".$data['page']."&status".$data['status'];
+            return json_decode($this->getURL($url), true);
+
         }else if(isset($data['status'])){
         $url = "?status=".$data['status'];
+        return json_decode($this->getURL($url), true);
 
         }else{
 
             $url = "";
-
+            return json_decode($this->getURL($url), true);
         }
-        return $this->getURL($url);
+        
      }
 
       /**
@@ -1400,6 +1434,13 @@ class Rave {
         );
         return $this->postURL($data);
 
+     }
+
+     function getvAccountsNum(){
+         $url = "";
+         $result = $this->getURL($url);
+         $result = json_decode($result, true);
+         return $result;
      }
 
       /**

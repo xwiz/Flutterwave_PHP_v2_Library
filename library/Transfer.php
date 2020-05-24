@@ -82,7 +82,7 @@ class Transfer {
         //set the payment handler 
         $this->transfer->eventHandler(new transferEventHandler)
         //set the endpoint for the api call
-        ->setEndPoint("");
+        ->setEndPoint("v3/transfers");
         //returns the value from the results
         return $this->transfer->transferSingle($array);
     }
@@ -97,17 +97,19 @@ class Transfer {
         return $this->transfer->transferBulk($array);
     }
 
-    function listTransfers($array){
-
-        //set the payment handler 
-        $this->transfer->eventHandler(new transferEventHandler)
+    function listTransfers($array = array('url'=>'blank')){
+            $this->transfer->eventHandler(new transferEventHandler)
         //set the endpoint for the api call
-        ->setEndPoint("v3/transfers");
+            ->setEndPoint("v3/transfers");
 
         return $this->transfer->listTransfers($array);
+        
+
+        //set the payment handler 
+        
     }
 
-    function bulkTransferStatus(){
+    function bulkTransferStatus($array){
 
          //set the payment handler 
          $this->transfer->eventHandler(new transferEventHandler)
@@ -116,7 +118,11 @@ class Transfer {
 
          return $this->transfer->bulkTransferStatus($array);
     }
-    function getApplicableFees(){
+    function getTransferFee($array){
+
+        if(in_array('amount', $array) && gettype($array['amount']) !== "string"){
+            $array['amount'] = (string) $array['amount'];
+        }
 
          //set the payment handler 
          $this->transfer->eventHandler(new transferEventHandler)
@@ -140,6 +146,11 @@ class Transfer {
         return $this->transfer->getBanksForTransfer();
     }
 
+
+    function verifyTransaction(){
+        //verify the charge
+        return $this->transfer->verifyTransaction($this->transfer->txref);//Uncomment this line if you need it
+    }
 
 
 

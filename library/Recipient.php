@@ -134,7 +134,7 @@ class Recipient {
             //set the endpoint for the api call
             ->setEndPoint("v3/beneficiaries/". $array['id']);
             //returns the value from the results
-            return $this->recipient->getBeneficiaries();
+            return $this->recipient->deleteBeneficiary();
         }  
 
     }

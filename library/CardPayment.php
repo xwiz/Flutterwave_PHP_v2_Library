@@ -89,7 +89,7 @@ class Card {
             //set the payment handler 
             $this->payment->eventHandler(new cardEventHandler)
             //set the endpoint for the api call
-            ->setEndPoint("/v3/charges");
+            ->setEndPoint("v3/charges");
             //returns the value from the results
             //$result = $this->payment->chargePayment($array);
             $result = $this->payment->chargePayment($array);
