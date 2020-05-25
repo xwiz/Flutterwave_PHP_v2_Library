@@ -12,19 +12,20 @@
             case 'true':
                 $otp = $_POST['otp'];
                 $ref = $_GET['ref'];
-                require("../library/AccountPayment.php");
-                $filePath = getcwd().DIRECTORY_SEPARATOR."account.txt";
+                require("../library/CardPayment.php");
+                $filePath = getcwd().DIRECTORY_SEPARATOR."payment.txt";
                 if (file_exists($filePath)){
                     $paymento = file_get_contents($filePath);
                     $payment = unserialize($paymento);           
                     if (!empty($payment)){
                         $validate = $payment->validateTransaction($otp, $ref);
+
                             echo '<body>';
-                            // echo '<div class="alert alert-primary role="alert">
-                            // <h1>Validate Result: </h1>
-                            // <p><b> '.print_r($validate, true).'</b></p>
-                            // </div>';
-                            echo $payment->return_txref();
+                            echo '<div class="alert alert-primary role="alert">
+                            <h1>Validate Result: </h1>
+                            <p><b> '.print_r($validate, true).'</b></p>
+                            </div>';
+                        echo $payment->return_txref();
                         $verify = $payment->verifyTransaction();
                         echo '<div class="alert alert-primary role="alert">
                         <h1>Verified Result: </h1>

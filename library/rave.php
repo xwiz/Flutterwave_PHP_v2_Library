@@ -70,7 +70,7 @@ class Rave {
     protected $end_point ;
     protected $authModelUsed;
     protected $flwRef;
-    protected $type;
+    public $type;
 
     /**
      * Construct
@@ -117,21 +117,21 @@ class Rave {
         $this->logger->notice('Generating Checksum....');
         $options = array( 
             "public_key" => $this->publicKey, 
-            "amount" => $this->amount, 
-            "customer_email" => $this->customerEmail, 
-            "customer_firstname" => $this->customerFirstname, 
-            "txref" => $this->txref, 
-            "payment_options" => $this->paymentOptions, 
-            "customer_lastname" => $this->customerLastname, 
-            "country" => $this->country, 
-            "currency" => $this->currency, 
-            "custom_description" => $this->customDescription, 
-            "custom_logo" => $this->customLogo, 
-            "custom_title" => $this->customTitle, 
-            "customer_phone" => $this->customerPhone,
-            "pay_button_text" => $this->payButtonText,
+            "amount" => $this->amount,  
+            "tx_ref" => $this->txref, 
+            "currency" => $this->currency,
+            "payment_options" => "card,mobilemoney,ussd", 
+            "customer" => [
+                "email"=> $this->customerEmail,
+                "phone_number"=> $this->customerPhone,
+                "name"=> $this->customerFirstname." ".$this->customerLastname 
+            ],
             "redirect_url" => $this->redirectUrl,
-            "hosted_payment" => 1
+            "customizations" => [ 
+                "description" => $this->customDescription, 
+                "logo" => $this->customLogo, 
+                "title" => $this->customTitle, 
+            ]
         );
         
         ksort($options);
@@ -143,6 +143,8 @@ class Rave {
         foreach($options as $key => $value){
             $hashedPayload .= $value;
         }
+
+        echo $hashedPayload;
         $completeHash = $hashedPayload.$this->secretKey;
         $hash = hash('sha256', $completeHash);
         
@@ -581,18 +583,44 @@ class Rave {
 
         $this->createCheckSum();
         $this->transactionData = array_merge($this->transactionData, array('integrity_hash' => $this->integrityHash), array('meta' => $this->meta));
-        
+             
+            
+           
+            // "customizations" => [ 
+            //     "description" => $this->customDescription, 
+            //     "logo" => $this->customLogo, 
+            //     "title" => $this->customTitle,
         $json = json_encode($this->transactionData);
         echo '<html>';
         echo '<body>';
         echo '<center>Proccessing...<br /><img src="ajax-loader.gif" /></center>';
         //'.$this->baseUrl.'/flwv3-pug/getpaidx/api/flwpbf-inline.js
         //https://checkout.flutterwave.com/v3.js - inline
-        echo '<script type="text/javascript" src="https://checkout.flutterwave.com/v3.js"></script>';
+        echo '<script type="text/javascript" src="https://ravemodal-dev.herokuapp.com/v3.js"></script>';
         echo '<script>';
 	    echo 'document.addEventListener("DOMContentLoaded", function(event) {';
         echo 'var data = JSON.parse(\''.$json.'\');';
-        echo 'getpaidSetup(data);';
+        echo 'FlutterwaveCheckout({
+            public_key: "'.$this->publicKey.'",
+            tx_ref: "'.$this->txref.'",
+            amount: '.$this->amount.',
+            currency: "'.$this->currency.'",
+            payment_options: "card,mobilemoney,ussd",
+            redirect_url:"'.$this->redirectUrl.'",
+            customer: {
+              email: "'.$this->customerEmail.'",
+              phone_number: "'.$this->customerPhone.'",
+              name: "'.$this->customerFirstname.' '.$this->customerLastname .'",
+            },
+            callback: function (data) {
+              console.log(data);
+            },
+            customizations: {
+              title: "My store",
+              description: "Payment for items in cart",
+              logo: "https://assets.piedpiper.com/logo.png",
+            }
+        });';
         echo '});';
         echo '</script>';
         echo '</body>';
@@ -719,15 +747,15 @@ class Rave {
      *  @param string
      *  @return object
      * */
-    function validateTransaction($otp,$type){
+    function validateTransaction($otp,$ref,$type){
 
         
                 $this->logger->notice('Validating otp...');
                 $this->setEndPoint("v3/validate-charge");
                 $this->post_data = array(
                     'type' => $type,//type can be card or account
+                    'flw_ref' => $ref,
                     'otp' => $otp,
-                    'flw_ref' => $this->flwRef
                 );
                 $result  = $this->postURL($this->post_data);
                 return $result;
@@ -983,15 +1011,15 @@ class Rave {
         $this->options = $array;
         
         //For Card which is now a Copliance Approve Issue
-        if(in_array('card', $array )){
+        if($this->type === 'card'){
             $this->json_options = json_encode($this->options);
             $this->logger->notice('Checking payment details..');
              //encrypt the required options to pass to the server
             $this->integrityHash = $this->encryption($this->json_options);
             $this->post_data = array(
              'public_key' => $this->publicKey,
-             'client' => $this->integrityHash,
-                'alg' => '3DES-24');
+             'client' => $this->integrityHash
+            );
 
             $result  = $this->postURL($this->post_data);
 
@@ -1305,8 +1333,6 @@ class Rave {
             $error = array('error'=>'Your payload is missing all properties');
             return $error;
         }
-
-       print_r($array);
 
         $result = $this->postUrl($array);
 

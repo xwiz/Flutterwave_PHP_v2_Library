@@ -9,8 +9,33 @@ var listFeatures;
 listFeatures = $('.features');
 
 listFeatures.click(function(){
-    window.location = "https://www.google.com";
-})
+    window.location = " ";
+});
 </script>
+
+
+
+<?php if($page === 'main'){?>
+        <script>
+          let feat = $('#feat');
+          $('li').removeClass('active');
+          feat.addClass('active');
+        </script>
+      <?php }?>
+      <?php if($page === 'code'){?>
+        <script>
+          let codepage = $('#code');
+          $('li').removeClass('active');
+          codepage.addClass('active');
+        </script>
+      <?php }?>
+      <?php if($page === 'result'){?>
+        <script>
+          let resultPage = $('#result');
+          $('li').removeClass('active');
+          resultPage.addClass('active');
+        </script>
+      <?php }?>
+
 </body>
 </html>

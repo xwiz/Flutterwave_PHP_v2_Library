@@ -92,6 +92,8 @@ class Account {
     //add tx_ref to the paylaod
     if(!isset($array['tx_ref']) || empty($array['tx_ref'])){
         $array['tx_ref'] = $this->payment->txref;
+    }else{
+        $this->payment->txref = $array['tx_ref'];   
     }
 
 
@@ -114,13 +116,17 @@ class Account {
             return $this->payment->chargePayment($array);
            
         }
-    function validateTransaction($otp){
+    function validateTransaction($otp, $ref){
             //validate the charge
         $this->payment->eventHandler(new accountEventHandler);
 
-        return $this->payment->validateTransaction($otp, $this->valType);//Uncomment this line if you need it
+        return $this->payment->validateTransaction($otp, $ref, $this->payment->type);//Uncomment this line if you need it
         
        }
+
+       function return_txref(){
+        return $this->payment->txref;
+    }
        
        function verifyTransaction(){
         //verify the charge

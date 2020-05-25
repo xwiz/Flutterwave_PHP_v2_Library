@@ -4,7 +4,7 @@ namespace Flutterwave;
 //uncomment if you need this
 //define("BASEPATH", 1);//Allow direct access to rave.php and raveEventHandler.php
 
-
+require_once('rave.php');
 require_once('raveEventHandlerInterface.php');
 
 use Flutterwave\Rave;
@@ -82,19 +82,30 @@ class cardEventHandler implements EventHandlerInterface{
 class Card {
     protected $payment;
     function __construct(){
-        $this->payment = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->payment = new Rave($_ENV['SECRET_KEY']);
         $this->valType = "card";
+        
+
     }
     function cardCharge($array){
+
+            if(!isset($array['tx_ref']) || empty($array['tx_ref'])){
+                $array['tx_ref'] = $this->payment->txref;
+            }else{
+                $this->payment->txref = $array['tx_ref'];
+            }
+            
+            $this->payment->type = 'card';
             //set the payment handler 
             $this->payment->eventHandler(new cardEventHandler)
             //set the endpoint for the api call
-            ->setEndPoint("v3/charges");
+            ->setEndPoint("v3/charges?type=".$this->payment->type);
             //returns the value from the results
             //$result = $this->payment->chargePayment($array);
+            
             $result = $this->payment->chargePayment($array);
 
-            return $this;
+            return $result;
         }
 
          /**you will need to validate and verify the charge
@@ -103,15 +114,18 @@ class Card {
              * You can write out your function to execute when the verification is successful in the onSuccessful function
          ***/
 
-        function validateTransaction($otp){
+        function validateTransaction($otp, $ref){
              //validate the charge
-           return $this->payment->validateTransaction($otp, $this->valType);//Uncomment this line if you need it
+           return $this->payment->validateTransaction($otp, $ref, $this->payment->type);//Uncomment this line if you need it
         }
 
-        
-        function verifyTransaction($txRef){
+        function return_txref(){
+            return $this->payment->txref;
+        }
+        function verifyTransaction(){
             //verify the charge
-            return $this->payment->verifyTransaction($txRef, $seckey=$_ENV['SECRET_KEY']);//Uncomment this line if you need it
+            return $this->payment->verifyTransaction($this->payment->txref);//Uncomment this line if you need it
+
         }
       
 

@@ -1,6 +1,6 @@
 
 <?php 
-
+$page = 'result';
 include('partials/header.php');//this is just to load the bootstrap and css. 
 
 DEFINE('DS', DIRECTORY_SEPARATOR);
@@ -26,13 +26,10 @@ $data = array(
 
 $payment = new Account();
 
-
-
-
 $result = $payment->accountCharge($data);
 $sera = serialize($payment);
 
-$filePath = getcwd().DS."payment.txt";
+$filePath = getcwd().DS."account.txt";
 if (is_writable($filePath)) {
     $fp = fopen($filePath, "w"); 
     fwrite($fp, $sera); 
@@ -45,7 +42,7 @@ echo '<div class="alert alert-success role="alert">
       </div>';
 
 //validating the charge by Entering otp.....
-echo '<iframe src = "otp.php" width = "100%" height = "400" frameBorder="0">
+echo '<iframe src = "otp.php?ref='.$result['data']['flw_ref'].'" width = "100%" height = "400" frameBorder="0">
 Sorry your browser does not support inline frames.
 </iframe>';
 

@@ -1,6 +1,6 @@
 
 <?php 
-
+$page = 'result';
 include('partials/header.php');//this is just to load the bootstrap and css. 
 
 require("../library/PaymentPlan.php");

@@ -176,19 +176,19 @@ if($postData['amount']){
     // ->setMetaData(array('metaname' => 'SomeOtherDataName', 'metavalue' => 'SomeOtherValue')) // can be called multiple times. Uncomment this to add meta datas
     ->initialize();
 }else{
-    if($getData['cancelled'] && $getData['txref']){
+    if($getData['cancelled'] && $getData['tx_ref']){
         // Handle canceled payments
         $payment
         ->eventHandler(new myEventHandler)
         ->requeryTransaction($getData['txref'])
         ->paymentCanceled($getData['txref']);
-    }elseif($getData['txref']){
+    }elseif($getData['tx_ref']){
         // Handle completed payments
         $payment->logger->notice('Payment completed. Now requerying payment.');
         
         $payment
         ->eventHandler(new myEventHandler)
-        ->requeryTransaction($getData['txref']);
+        ->requeryTransaction($getData['tx_ref']);
     }else{
         $payment->logger->warn('Stop!!! Please pass the txref parameter!');
         echo 'Stop!!! Please pass the txref parameter!';
