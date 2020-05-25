@@ -24,7 +24,7 @@ $publicKey = $_SERVER['PUBLIC_KEY'];
 $secretKey = $_SERVER['SECRET_KEY'];
 $success_url = $postData['successurl'];
 $failure_url = $postData['failureurl'];
-$env = $_SERVER['RAVE_ENVIRONMENT'];
+$env = $_SERVER['ENV'];
 
 if($postData['amount']){
     $_SESSION['publicKey'] = $publicKey;
@@ -180,8 +180,8 @@ if($postData['amount']){
         // Handle canceled payments
         $payment
         ->eventHandler(new myEventHandler)
-        ->requeryTransaction($getData['txref'])
-        ->paymentCanceled($getData['txref']);
+        ->requeryTransaction($getData['tx_ref'])
+        ->paymentCanceled($getData['tx_ref']);
     }elseif($getData['tx_ref']){
         // Handle completed payments
         $payment->logger->notice('Payment completed. Now requerying payment.');
