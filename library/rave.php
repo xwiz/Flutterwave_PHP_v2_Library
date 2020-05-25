@@ -84,7 +84,7 @@ class Rave {
     function __construct($secretKey,$prefix = 'RV', $overrideRefWithPrefix = false){
         $this->secretKey = $secretKey;
         $this->publicKey = getenv('PUBLIC_KEY');
-        $this->env = getenv('RAVE_ENVIRONMENT');
+        $this->env = getenv('ENV');
         $this->transactionPrefix = $overrideRefWithPrefix ? $prefix : $prefix.'_';
         $this->overrideTransactionReference = $overrideRefWithPrefix;
         // create a log channel
@@ -136,20 +136,20 @@ class Rave {
         
         ksort($options);
         
-        $this->transactionData = $options;
+        // $this->transactionData = $options;
         
-        $hashedPayload = '';
+        // $hashedPayload = '';
         
-        foreach($options as $key => $value){
-            $hashedPayload .= $value;
-        }
+        // foreach($options as $key => $value){
+        //     $hashedPayload .= $value;
+        // }
 
-        echo $hashedPayload;
-        $completeHash = $hashedPayload.$this->secretKey;
-        $hash = hash('sha256', $completeHash);
+        // echo $hashedPayload;
+        // $completeHash = $hashedPayload.$this->secretKey;
+        // $hash = hash('sha256', $completeHash);
         
-        $this->integrityHash = $hash;
-        return $this;
+        // $this->integrityHash = $hash;
+        // return $this;
     }
 
     /**
@@ -582,7 +582,7 @@ class Rave {
     function initialize(){
 
         $this->createCheckSum();
-        $this->transactionData = array_merge($this->transactionData, array('integrity_hash' => $this->integrityHash), array('meta' => $this->meta));
+        //$this->transactionData = array_merge($this->transactionData, array('integrity_hash' => $this->integrityHash), array('meta' => $this->meta));
              
             
            
@@ -590,7 +590,7 @@ class Rave {
             //     "description" => $this->customDescription, 
             //     "logo" => $this->customLogo, 
             //     "title" => $this->customTitle,
-        $json = json_encode($this->transactionData);
+        //$json = json_encode($this->transactionData);
         echo '<html>';
         echo '<body>';
         echo '<center>Proccessing...<br /><img src="ajax-loader.gif" /></center>';
@@ -599,7 +599,7 @@ class Rave {
         echo '<script type="text/javascript" src="https://ravemodal-dev.herokuapp.com/v3.js"></script>';
         echo '<script>';
 	    echo 'document.addEventListener("DOMContentLoaded", function(event) {';
-        echo 'var data = JSON.parse(\''.$json.'\');';
+        //echo 'var data = JSON.parse(\''.$json.'\');';
         echo 'FlutterwaveCheckout({
             public_key: "'.$this->publicKey.'",
             tx_ref: "'.$this->txref.'",
@@ -616,16 +616,16 @@ class Rave {
               console.log(data);
             },
             customizations: {
-              title: "My store",
-              description: "Payment for items in cart",
-              logo: "https://assets.piedpiper.com/logo.png",
+              title: "'.$this->customTitle.'",
+              description: "'.$this->customDescription.'",
+              logo: "'.$this->customLogo.'",
             }
         });';
         echo '});';
         echo '</script>';
         echo '</body>';
         echo '</html>';
-        return $json;
+        // return $json;
     }
 
     /**
