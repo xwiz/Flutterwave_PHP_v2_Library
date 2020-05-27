@@ -1,6 +1,8 @@
 <?php
 namespace Flutterwave;
 
+define("BASEPATH", 1);
+
 //uncomment if you need this
 //define("BASEPATH", 1);//Allow direct access to rave.php and raveEventHandler.php
 
@@ -10,7 +12,7 @@ require_once('raveEventHandlerInterface.php');
 use Flutterwave\Rave;
 use Flutterwave\EventHandlerInterface;
 
-class ussdEventHandler implements EventHandlerInterface{
+class transactionVerificationEventHandler implements EventHandlerInterface{
     /**
      * This is called only when a transaction is successful
      * */
@@ -70,19 +72,58 @@ class ussdEventHandler implements EventHandlerInterface{
       
     }
 }
-
-class Ussd {
-    protected $ussd;
+class Transactions{
     function __construct(){
-        $ussd = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->history = new Rave($_ENV['SECRET_KEY']);
     }
-    function ussd($array){
-            //set the payment handler 
-            $this->ussd->eventHandler(new ussdEventHandler)
-            //set the endpoint for the api call
-            ->setEndPoint("flwv3-pug/getpaidx/api/v2/hosted/pay");
-            //returns the value from the results
-            return $this->ussd->pay($array);
+    function viewTransactions(){
+        //set the payment handler 
+        $this->history->eventHandler(new transactionVerificationEventHandler)
+        //set the endpoint for the api call
+        ->setEndPoint("v3/transactions");
+        //returns the value from the results
+        return $this->history->getAllTransactions();
+    }
+
+    function getTransactionFee($array = array()){
+
+        if(!isset($array['amount'])){
+            return '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
+            The following query param  is required <b>  amount </b>
+          </div>';
         }
+        
+
+        $this->history->eventHandler(new transactionVerificationEventHandler)
+        //set the endpoint for the api call
+        ->setEndPoint("v3/transactions/fee");
+        //returns the value from the results
+        return $this->history->getTransactionFee($array);
+    }
+
+    function verifyTransaction(){
+
+            $array['tx_ref'] = $this->history->txref;
+        
+        $this->history->eventHandler(new transactionVerificationEventHandler)
+        //set the endpoint for the api call
+        ->setEndPoint("v3/transactions/".$array['tx_ref']."/verify");
+        //returns the value from the results
+        return $this->history->verifyTransaction();
+    }
+
+
+    function viewTimeline($array = array()){
+        if(!isset($array['id'])){
+            return '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
+            Missing value for <b> id </b> in your payload
+          </div>';
+        }        
+
+        $this->history->eventHandler(new transactionVerificationEventHandler)
+        //set the endpoint for the api call
+        ->setEndPoint("v3/transactions/".$array['id']."/events");
+        //returns the value from the results
+        return $this->history->transactionTimeline();
+    }
 }
-?>

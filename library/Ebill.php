@@ -1,8 +1,6 @@
 <?php
-namespace Flutterwave;
 
-//uncomment if you need this
-//define("BASEPATH", 1);//Allow direct access to rave.php and raveEventHandler.php
+namespace Flutterwave;
 
 require_once('rave.php');
 require_once('raveEventHandlerInterface.php');
@@ -10,8 +8,8 @@ require_once('raveEventHandlerInterface.php');
 use Flutterwave\Rave;
 use Flutterwave\EventHandlerInterface;
 
-class accountEventHandler implements EventHandlerInterface{
-    /**
+class ebillEventHandler implements EventHandlerInterface{
+     /**
      * This is called only when a transaction is successful
      * */
     function onSuccessful($transactionData){
@@ -25,11 +23,6 @@ class accountEventHandler implements EventHandlerInterface{
         // Give value for the transaction
         // Update the transaction to note that you have given value for the transaction
         // You can also redirect to your success page from here
-        if($transactionData["data"]["chargecode"] === '00' || $transactionData["data"]["chargecode"] === '0'){
-          echo "Transaction Completed";
-      }else{
-          $this->onFailure($transactionData);
-      }
     }
     
     /**
@@ -76,37 +69,55 @@ class accountEventHandler implements EventHandlerInterface{
     }
 }
 
-
-class Account {
-    protected $payment;
-
+class Ebill {
     function __construct(){
-        $this->payment = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->eb = new Rave($_ENV['SECRET_KEY']);
+        $this->keys = array('amount', 'phone_number','country', 'ip','email');
     }
-    function accountCharge($array){
-            //set the payment handler 
-            $this->payment->eventHandler(new accountEventHandler)
-            //set the endpoint for the api call
-            ->setEndPoint("flwv3-pug/getpaidx/api/charge");
-            //returns the value from the results
-            //you can choose to store the returned value in a variable and validate within this function
-            $this->payment->setAuthModel("AUTH");
-            return $this->payment->chargePayment($array);
-            /**you will need to validate and verify the charge
-             * Validating the charge will require an otp
-             * After validation then verify the charge with the txRef
-             * You can write out your function to execute when the verification is successful in the onSuccessful function
-             ***/
+    function order($array){
+
+        if(!isset($array['tx_ref']) || empty($array['tx_ref'])){
+            $array['tx_ref'] = $this->payment->txref;
         }
-    function validateTransaction($otp){
-            //validate the charge
-        $this->payment->eventHandler(new accountEventHandler);
-        return $this->payment->validateTransaction($otp);//Uncomment this line if you need it
-       }
-    function verifyTransaction($txRef){
-           //verify the charge
-        $this->payment->eventHandler(new accountEventHandler);
-        return $this->payment->verifyTransaction($txRef, $_ENV['SECRET_KEY']);//Uncomment this line if you need it
-       }
+
+        if(!isset($array['amount']) || !isset($array['phone_number']) || 
+        !isset($array['email']) || !isset($array['country']) || !isset($array['ip'])){
+            return '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
+            Missing values for one of the following body params: <b> "'.$this->keys[0].' , '.$this->keys[1].' , '.$this->keys[2].' , '.$this->keys[3].' and '.$this->keys[4].'"</b>
+          </div>';
+        }
+
+        
+        $this->eb->eventHandler(new ebillEventHandler)
+        //set the endpoint for the api call
+        ->setEndPoint("v3/ebills");
+        //returns the value of the result.
+       return $this->eb->createOrder($array); 
     }
-?>
+
+    function updateOrder($data){
+        
+
+        if(!isset($data['amount'])){
+            return '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
+         Missing values for one of the following body params: <b> "'.$this->keys[0].' '.'and reference'.'"</b>
+          </div>';
+        }
+
+        if(gettype($data['amount']) !== 'integer'){
+            $data['amount'] = (int) $data['amount'];
+        }
+        
+
+       $this->eb->eventHandler(new ebillEventHandler)
+        //set the endpoint for the api call
+        ->setEndPoint("v3/ebills/".$data['reference']);
+        //returns the value of the result.
+       return $this->eb->updateOrder($data); 
+    }
+}
+
+
+
+
+

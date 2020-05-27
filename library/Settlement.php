@@ -1,16 +1,14 @@
 <?php
+
 namespace Flutterwave;
 
-//uncomment if you need this
-//define("BASEPATH", 1);//Allow direct access to rave.php and raveEventHandler.php
-
-require_once('rave.php');
+require("lib/rave.php");
 require_once('raveEventHandlerInterface.php');
 
 use Flutterwave\Rave;
 use Flutterwave\EventHandlerInterface;
 
-class recipientEventHandler implements EventHandlerInterface{
+class settlementEventHandler implements EventHandlerInterface{
     /**
      * This is called only when a transaction is successful
      * */
@@ -71,19 +69,29 @@ class recipientEventHandler implements EventHandlerInterface{
     }
 }
 
-
-class Recipient {
-    protected $recipient;
+class Settlement {
     function __construct(){
-        $this->recipient = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->settle = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
     }
-    function recipient($array){
-            //set the payment handler 
-            $this->recipient->eventHandler(new recipientEventHandler)
-            //set the endpoint for the api call
-            ->setEndPoint("v2/gpx/transfers/beneficiaries/create");
-            //returns the value from the results
-            return $this->recipient->beneficiary($array);
-        }
+
+    function fetchSettlement($array){
+        //set the payment handler 
+        $this->subscription->eventHandler(new settlementEventHandler)
+        //set the endpoint for the api call
+        ->setEndPoint("v3/settlements/".$array['id']);
+        //returns the value from the results
+        return $this->settle->fetchASettlement();
+
     }
-?>
+
+    function listAllSettlements(){
+        //set the payment handler 
+        $this->settle->eventHandler(new settlementEventHandler)
+        //set the endpoint for the api call
+        ->setEndPoint("v3/settlements");
+        //returns the value from the results
+        return $this->settle->getAllSettlements();
+
+    }
+
+}

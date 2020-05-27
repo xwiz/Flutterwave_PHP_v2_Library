@@ -10,9 +10,12 @@ require_once('raveEventHandlerInterface.php');
 use Flutterwave\Rave;
 use Flutterwave\EventHandlerInterface;
 
-class paymentPlanEventHandler implements EventHandlerInterface{
+
+
+class cardEventHandler implements EventHandlerInterface{
     /**
-     * This is called only when a transaction is successful
+     * This is called only when a transaction is successful 
+     * @param array
      * */
     function onSuccessful($transactionData){
         // Get the transaction from your DB using the transaction reference (txref)
@@ -25,6 +28,11 @@ class paymentPlanEventHandler implements EventHandlerInterface{
         // Give value for the transaction
         // Update the transaction to note that you have given value for the transaction
         // You can also redirect to your success page from here
+        if($transactionData["data"]["chargecode"] === '00' || $transactionData["data"]["chargecode"] === '0'){
+            echo "Transaction Completed";
+        }else{
+          $this->onFailure($transactionData);
+      }
     }
     
     /**
@@ -71,19 +79,56 @@ class paymentPlanEventHandler implements EventHandlerInterface{
     }
 }
 
-
-class PaymentPlan{
-    protected $plan;
+class Card {
+    protected $payment;
     function __construct(){
-        $this->plan = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->payment = new Rave($_ENV['SECRET_KEY']);
+        $this->valType = "card";
+        
+
     }
-    function createPlan($array){
+    function cardCharge($array){
+
+            if(!isset($array['tx_ref']) || empty($array['tx_ref'])){
+                $array['tx_ref'] = $this->payment->txref;
+            }else{
+                $this->payment->txref = $array['tx_ref'];
+            }
+            
+            $this->payment->type = 'card';
             //set the payment handler 
-            $this->plan->eventHandler(new paymentPlanEventHandler)
+            $this->payment->eventHandler(new cardEventHandler)
             //set the endpoint for the api call
-            ->setEndPoint("v2/gpx/paymentplans/create");
+            ->setEndPoint("v3/charges?type=".$this->payment->type);
             //returns the value from the results
-            return $this->plan->createPlan($array);
+            //$result = $this->payment->chargePayment($array);
+            
+            $result = $this->payment->chargePayment($array);
+
+            return $result;
         }
+
+         /**you will need to validate and verify the charge
+             * Validating the charge will require an otp
+             * After validation then verify the charge with the txRef
+             * You can write out your function to execute when the verification is successful in the onSuccessful function
+         ***/
+
+        function validateTransaction($otp, $ref){
+             //validate the charge
+           return $this->payment->validateTransaction($otp, $ref, $this->payment->type);//Uncomment this line if you need it
+        }
+
+        function return_txref(){
+            return $this->payment->txref;
+        }
+        function verifyTransaction(){
+            //verify the charge
+            return $this->payment->verifyTransaction($this->payment->txref);//Uncomment this line if you need it
+
+        }
+      
+
     }
+
 ?>

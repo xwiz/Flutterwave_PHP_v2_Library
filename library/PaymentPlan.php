@@ -10,7 +10,7 @@ require_once('raveEventHandlerInterface.php');
 use Flutterwave\Rave;
 use Flutterwave\EventHandlerInterface;
 
-class bvnEventHandler implements EventHandlerInterface{
+class paymentPlanEventHandler implements EventHandlerInterface{
     /**
      * This is called only when a transaction is successful
      * */
@@ -71,19 +71,88 @@ class bvnEventHandler implements EventHandlerInterface{
     }
 }
 
-class Bvn {
-    protected $bvn;
+
+class PaymentPlan{
+    protected $plan;
     function __construct(){
-        $this->bvn = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->plan = new Rave($_ENV['SECRET_KEY']);
     }
-    function verifyBVN($bvn){
+    function createPlan($array){
             //set the payment handler 
-            $this->bvn->eventHandler(new bvnEventHandler)
+            $this->plan->eventHandler(new paymentPlanEventHandler)
             //set the endpoint for the api call
-            ->setEndPoint("v2/kyc/bvn");
+            ->setEndPoint("v3/payment-plans");
+
+            if(empty($array['amount']) || !array_key_exists('amount',$array) || 
+            empty($array['name']) || !array_key_exists('name',$array) || 
+            empty($array['interval']) || !array_key_exists('interval',$array) ||
+            empty($array['duration']) || !array_key_exists('duration',$array)){
+
+                return '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
+                Missing values for the following parameters  <b> amount, name , interval, or duration </b>
+              </div>';
+            }
+
+            // if(!empty($array['amount'])){
+
+            // }
+            
             //returns the value from the results
-            return $this->bvn->bvn($bvn);
+            return $this->plan->createPlan($array);
+
+        }
+
+        function updatePlan($array){
+
+            if(!isset($array['id']) || !isset($array['name']) || !isset($array['status'])){
+                return '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
+                Missing values for a parametter: <b> id, name, or status</b>
+              </div>';
+            }
+
+            //set the payment handler 
+            $this->plan->eventHandler(new paymentPlanEventHandler)
+            //set the endpoint for the api call
+            ->setEndPoint("v3/payment-plans/".$array['id']);
+
+
+            return $this->plan->updatePlan($array);
+
+        }
+
+        function cancelPlan($array){
+
+            if(!isset($array['id'])){
+                return '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
+                Missing values for a parametter: <b> id</b>
+              </div>';
+            }
+
+            //set the payment handler 
+            $this->plan->eventHandler(new paymentPlanEventHandler)
+            //set the endpoint for the api call
+            ->setEndPoint("v3/payment-plans/".$array['id']."/cancel");
+
+            return $this->plan->cancelPlan($array);
+
+        }
+
+        function getPlans(){
+            //set the payment handler 
+            $this->plan->eventHandler(new paymentPlanEventHandler)
+            //set the endpoint for the api call
+            ->setEndPoint("v3/payment-plans");
+
+            return $this->plan->getPlans();
+        }
+
+        function get_a_Plan($array){
+            //set the payment handler 
+            $this->plan->eventHandler(new paymentPlanEventHandler)
+            //set the endpoint for the api call
+            ->setEndPoint("v3/payment-plans/".$array['id']);
+
+             return $this->plan->get_a_Plan();
         }
     }
-
 ?>

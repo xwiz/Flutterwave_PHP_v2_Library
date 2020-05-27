@@ -10,7 +10,7 @@ require_once('raveEventHandlerInterface.php');
 use Flutterwave\Rave;
 use Flutterwave\EventHandlerInterface;
 
-class subscriptionEventHandler implements EventHandlerInterface{
+class ussdEventHandler implements EventHandlerInterface{
     /**
      * This is called only when a transaction is successful
      * */
@@ -71,39 +71,40 @@ class subscriptionEventHandler implements EventHandlerInterface{
     }
 }
 
-
-class Subscription{
-    protected $subscription;
+class Ussd {
+    protected $ussd;
     function __construct(){
-        $this->subscription = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->payment = new Rave($_ENV['SECRET_KEY']);
+        $this->type = "qr";
     }
+    function ussd($array){
 
-    function activateSubscription($id){
-        //set the payment handler 
-        $endPoint = 'v2/gpx/subscriptions/'.$id.'/activate';
-        $this->subscription->eventHandler(new subscriptionEventHandler)
-        //set the endpoint for the api call
-        ->setEndPoint($endPoint);
-        //returns the value from the results
-        return $this->subscription->activateSubscription();
-    }
+            //add tx_ref to the paylaod
+            if(!isset($array['tx_ref']) || empty($array['tx_ref'])){
+                $array['tx_ref'] = $this->payment->txref;
+            }
+    
 
-    function getAllSubscription(){
-            //set the payment handler 
-            $this->subscription->eventHandler(new subscriptionEventHandler)
-            //set the endpoint for the api call
-            ->setEndPoint("v2/gpx/subscriptions/query");
-            //returns the value from the results
-            return $this->subscription->getAllSubscription();
+
+        if($array['type'] !== $this->type){
+            return '<div class="alert alert-danger" role="alert">
+            The Type specified in the payload  is not <b> "'.$this->type.'"</b>
+          </div>';
         }
-
-    function fetchASubscription($email){
-            //set the payment handler 
-            $this->subscription->eventHandler(new subscriptionEventHandler)
-            //set the endpoint for the api call
-            ->setEndPoint("v2/gpx/subscriptions/query");
-            //returns the value from the results
-            return $this->subscription->fetchASubscription($email);
-        }
+                 //set the payment handler 
+                 $this->payment->eventHandler(new ussdEventHandler)
+                 //set the endpoint for the api call
+                 ->setEndPoint("v3/charges?type=".$this->type);
+                 //returns the value from the results
+                 return $this->payment->chargePayment($array);
+        
+           
     }
+
+    function verifyTransaction(){
+        //verify the charge
+        return $this->payment->verifyTransaction($this->payment->txref);//Uncomment this line if you need it
+    }
+
+}
 ?>

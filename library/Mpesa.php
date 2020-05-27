@@ -1,18 +1,16 @@
-<?php
+<?php 
+
 namespace Flutterwave;
-
-//uncomment if you need this
-//define("BASEPATH", 1);//Allow direct access to rave.php and raveEventHandler.php
-
-require_once('rave.php');
-require_once('raveEventHandlerInterface.php');
+require("rave.php");
+require("raveEventHandlerInterface.php");
 
 use Flutterwave\Rave;
 use Flutterwave\EventHandlerInterface;
 
-class transactionVerificationEventHandler implements EventHandlerInterface{
+class mpesaEventHandler implements EventHandlerInterface{
     /**
-     * This is called only when a transaction is successful
+     * This is called only when a transaction is successful 
+     * @param array
      * */
     function onSuccessful($transactionData){
         // Get the transaction from your DB using the transaction reference (txref)
@@ -25,6 +23,15 @@ class transactionVerificationEventHandler implements EventHandlerInterface{
         // Give value for the transaction
         // Update the transaction to note that you have given value for the transaction
         // You can also redirect to your success page from here
+        if($transactionData["data"]["chargecode"] === '00' || $transactionData["data"]["chargecode"] === '0'){
+        
+            echo "Transaction Completed";
+
+        }else{
+
+          $this->onFailure($transactionData);
+
+      }
     }
     
     /**
@@ -71,17 +78,45 @@ class transactionVerificationEventHandler implements EventHandlerInterface{
     }
 }
 
-
-class TransactionVerification {
-    protected $validate;
+class Mpesa {
     function __construct(){
-        $this->validate = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->payment = new Rave($_SERVER['SECRET_KEY']);
+        $this->type = "mpesa";
     }
-    function transactionVerify($txref){
-            //set the payment handler 
-            $this->validate->eventHandler(new transactionVerificationEventHandler);
-            //returns the value from the results
-            return $this->validate->verifyTransaction($txref);
+
+    function mpesa($array){
+
+        //add tx_ref to the paylaod
+        if(!isset($array['tx_ref']) || empty($array['tx_ref'])){
+            $array['tx_ref'] = $this->payment->txref;
         }
+
+        
+        if($array['type'] !== $this->type){
+            return '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
+            The Type specified in the payload  is not <b> "'.$this->type.'"</b>
+          </div>';
+        }
+        
+        //set the payment handler 
+        $this->payment->eventHandler(new mpesaEventHandler)
+        //set the endpoint for the api call
+        ->setEndPoint("v3/charges?type=".$this->type);
+        //returns the value from the results
+        return $this->payment->chargePayment($array);
     }
-?>
+
+     /**you will need to verify the charge
+         * After validation then verify the charge with the txRef
+         * You can write out your function to execute when the verification is successful in the onSuccessful function
+     ***/
+    function verifyTransaction(){
+        //verify the charge
+        return $this->payment->verifyTransaction($this->payment->txref);//Uncomment this line if you need it
+    }
+  
+
+}
+
+    
+

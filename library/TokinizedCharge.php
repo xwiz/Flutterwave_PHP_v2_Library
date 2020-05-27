@@ -10,12 +10,9 @@ require_once('raveEventHandlerInterface.php');
 use Flutterwave\Rave;
 use Flutterwave\EventHandlerInterface;
 
-
-
-class cardEventHandler implements EventHandlerInterface{
+class tkEventHandler implements EventHandlerInterface{
     /**
-     * This is called only when a transaction is successful 
-     * @param array
+     * This is called only when a transaction is successful
      * */
     function onSuccessful($transactionData){
         // Get the transaction from your DB using the transaction reference (txref)
@@ -29,8 +26,8 @@ class cardEventHandler implements EventHandlerInterface{
         // Update the transaction to note that you have given value for the transaction
         // You can also redirect to your success page from here
         if($transactionData["data"]["chargecode"] === '00' || $transactionData["data"]["chargecode"] === '0'){
-            echo "Transaction Completed";
-        }else{
+          echo "Transaction Completed";
+      }else{
           $this->onFailure($transactionData);
       }
     }
@@ -79,38 +76,85 @@ class cardEventHandler implements EventHandlerInterface{
     }
 }
 
-class MobileMoney {
+
+class TokinizedCharge {
     protected $payment;
+
     function __construct(){
-        $this->payment = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->payment = new Rave($_ENV['SECRET_KEY']);
     }
-    function mobilemoney($array){
+    function tokenCharge($array){
+
+        //add tx_ref to the paylaod
+        if(!isset($array['tx_ref']) || empty($array['tx_ref'])){
+            $array['tx_ref'] = $this->payment->txref;
+        }
+
+        if(gettype($array['amount']) !== "integer"){
+            return '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
+            Amount needs to be an integer.
+          </div>'; 
+        }
+
+        if(!isset($array['token']) || !isset($array['currency']) || !isset($array['country']) || !isset($array['amount']) || !isset($array['email'])){
+            return '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
+            Missing Param in the Payload. Please check you payload.
+          </div>';
+        }
             //set the payment handler 
-            $this->payment->eventHandler(new cardEventHandler)
+            $this->payment->eventHandler(new tkEventHandler)
             //set the endpoint for the api call
-            ->setEndPoint("flwv3-pug/getpaidx/api/charge");
+            ->setEndPoint("v3/tokenized-charges");
             //returns the value from the results
-            $result = $this->payment->chargePayment($array);
-            if($result){
-                  $this->payment->setAuthModel($result["data"]["authModelUsed"]);
-                  return $result;
-             }else{
-                return json_decode(array(
-                    "error"=>"There was an error in charging this number"
-                ),true);
-             }
-        }
+            //you can choose to store the returned value in a variable and validate within this function
+            return $this->payment->tokenCharge($array);
+          
+    }
+    
 
-         /**you will need to verify the charge
-             * After validation then verify the charge with the txRef
-             * You can write out your function to execute when the verification is successful in the onSuccessful function
-         ***/
-        function verifyTransaction($txRef){
-            //verify the charge
-            return $this->payment->verifyTransaction($txRef);//Uncomment this line if you need it
-        }
-      
+    function updateEmailTiedToToken($data){
+
+        //set the payment handler 
+        $this->payment->eventHandler(new tkEventHandler)
+        //set the endpoint for the api call
+        ->setEndPoint("v2/gpx/tokens/embed_token/update_customer");
+        //returns the value from the results
+        //you can choose to store the returned value in a variable and validate within this function
+        return $this->payment->postURL($data);
 
     }
 
+    function bulkCharge($data){
+            //https://api.ravepay.co/flwv3-pug/getpaidx/api/tokenized/charge_bulk
+         //set the payment handler 
+         $this->payment->eventHandler(new tkEventHandler)
+         //set the endpoint for the api call
+         ->setEndPoint("flwv3-pug/getpaidx/api/tokenized/charge_bulk");
+
+         $this->payment->bulkCharges($data);
+
+    }
+
+    function bulkChargeStatus($data)
+    {
+        //https://api.ravepay.co/flwv3-pug/getpaidx/api/tokenized/charge_bulk
+         //set the payment handler 
+         $this->payment->eventHandler(new tkEventHandler)
+         //set the endpoint for the api call
+         ->setEndPoint("flwv3-pug/getpaidx/api/tokenized/charge_bulk");
+
+         $this->payment->bulkCharges($data);
+    }
+
+    function verifyTransaction(){
+        //verify the charge
+        return $this->payment->verifyTransaction($this->payment->txref);//Uncomment this line if you need it
+    }
+
+    
+       
+    
+    }
+
+    
 ?>

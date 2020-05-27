@@ -10,12 +10,9 @@ require_once('raveEventHandlerInterface.php');
 use Flutterwave\Rave;
 use Flutterwave\EventHandlerInterface;
 
-
-
-class cardEventHandler implements EventHandlerInterface{
+class accountEventHandler implements EventHandlerInterface{
     /**
-     * This is called only when a transaction is successful 
-     * @param array
+     * This is called only when a transaction is successful
      * */
     function onSuccessful($transactionData){
         // Get the transaction from your DB using the transaction reference (txref)
@@ -29,8 +26,8 @@ class cardEventHandler implements EventHandlerInterface{
         // Update the transaction to note that you have given value for the transaction
         // You can also redirect to your success page from here
         if($transactionData["data"]["chargecode"] === '00' || $transactionData["data"]["chargecode"] === '0'){
-            echo "Transaction Completed";
-        }else{
+          echo "Transaction Completed";
+      }else{
           $this->onFailure($transactionData);
       }
     }
@@ -79,59 +76,63 @@ class cardEventHandler implements EventHandlerInterface{
     }
 }
 
-class Card {
+
+class Account {
     protected $payment;
+
     function __construct(){
-        $this->payment = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->payment = new Rave($_ENV['SECRET_KEY']);
+        $this->type = array('debit_uk_account','debit_ng_account');
+        $this->valType = "account";
     }
-    function cardCharge($array){
+    
+    function accountCharge($array){
             //set the payment handler 
-            $this->payment->eventHandler(new cardEventHandler)
-            //set the endpoint for the api call
-            ->setEndPoint("flwv3-pug/getpaidx/api/charge");
-            //returns the value from the results
-            //$result = $this->payment->chargePayment($array);
-            $result = $this->payment->chargePayment($array);
-                //check the value of the returned data for the suggested_auth response
-             if(isset($result["data"]["suggested_auth"])){
-                 if($result["data"]["suggested_auth"] === "PIN"){
-                     //validates the pin on the request data
-                     $this->payment->setAuthModel("PIN");
-                     return $this->payment->chargePayment($array);
-                 }
-                 else{
-                    
 
-                    $this->payment->setAuthModel("NOAUTH_INTERNATIONAL");
-                    return $this->payment->chargePayment($array);
-     
-                     //TODO: Update $this->options with the billing addres details
-                     //$this->chargePayment($this->options) //uncomment this function when charging international cards
-                 }
-             }else{
-                  // $array["suggested_auth"] = "NOAUTH_INTERNATIONAL";
-                  $this->payment->setAuthModel($result["data"]["authModelUsed"]);
-                  return $result;
-             }
-            return $this;
-        }
-
-         /**you will need to validate and verify the charge
-             * Validating the charge will require an otp
-             * After validation then verify the charge with the txRef
-             * You can write out your function to execute when the verification is successful in the onSuccessful function
-         ***/
-
-        function validateTransaction($otp){
-             //validate the charge
-           return $this->payment->validateTransaction($otp);//Uncomment this line if you need it
-        }
-        function verifyTransaction($txRef){
-            //verify the charge
-            return $this->payment->verifyTransaction($txRef, $seckey=$_ENV['SECRET_KEY']);//Uncomment this line if you need it
-        }
-      
-
+    //add tx_ref to the paylaod
+    if(!isset($array['tx_ref']) || empty($array['tx_ref'])){
+        $array['tx_ref'] = $this->payment->txref;
+    }else{
+        $this->payment->txref = $array['tx_ref'];   
     }
 
+
+    if(!in_array($array['type'], $this->type)){
+            echo '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
+            The Type specified in the payload  is not <b> "'.$this->type[0].' or '.$this->type[1].'"</b>
+          </div>';
+    }
+
+
+            $this->payment->eventHandler(new accountEventHandler);
+            //set the endpoint for the api call
+            if ($this->type === $this->type[0]){
+                $this->payment->setEndPoint("v3/charges?type=debit_uk_account");
+            }else{
+                $this->payment->setEndPoint("v3/charges?type=debit_ng_account");
+            }
+
+            
+            return $this->payment->chargePayment($array);
+           
+        }
+    function validateTransaction($otp, $ref){
+            //validate the charge
+        $this->payment->eventHandler(new accountEventHandler);
+
+        return $this->payment->validateTransaction($otp, $ref, $this->payment->type);//Uncomment this line if you need it
+        
+       }
+
+       function return_txref(){
+        return $this->payment->txref;
+    }
+       
+       function verifyTransaction(){
+        //verify the charge
+        return $this->payment->verifyTransaction($this->payment->txref);//Uncomment this line if you need it
+        }
+    }
+
+    
 ?>

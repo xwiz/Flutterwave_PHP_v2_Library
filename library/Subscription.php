@@ -10,7 +10,7 @@ require_once('raveEventHandlerInterface.php');
 use Flutterwave\Rave;
 use Flutterwave\EventHandlerInterface;
 
-class refundEventHandler implements EventHandlerInterface{
+class subscriptionEventHandler implements EventHandlerInterface{
     /**
      * This is called only when a transaction is successful
      * */
@@ -72,18 +72,40 @@ class refundEventHandler implements EventHandlerInterface{
 }
 
 
-class Refund {
-    protected $refund;
+class Subscription{
+    protected $subscription;
     function __construct(){
-        $this->refund = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->subscription = new Rave($_ENV['SECRET_KEY']);
     }
-    function refund($array){
+
+    function activateSubscription($id){
+        //set the payment handler 
+        $endPoint = 'v3/subscriptions/'.$id.'/activate';
+        $this->subscription->eventHandler(new subscriptionEventHandler)
+        //set the endpoint for the api call
+        ->setEndPoint($endPoint);
+        //returns the value from the results
+        return $this->subscription->activateSubscription();
+    }
+
+    function getAllSubscription(){
             //set the payment handler 
-            $this->refund->eventHandler(new refundEventHandler)
+            $this->subscription->eventHandler(new subscriptionEventHandler)
             //set the endpoint for the api call
-            ->setEndPoint("gpx/merchant/transactions/refund");
+            ->setEndPoint("v3/subscriptions");
             //returns the value from the results
-            return $this->refund->refund($array);
+            return $this->subscription->getAllSubscription();
+        }
+
+    function cancelSubscription($id){
+        $endPoint = 'v3/subscriptions/'.$id.'/cancel';
+            //set the payment handler 
+
+            $this->subscription->eventHandler(new subscriptionEventHandler)
+            //set the endpoint for the api call
+            ->setEndPoint($endPoint);
+            //returns the value from the results
+            return $this->subscription->cancelSubscription();
         }
     }
 ?>

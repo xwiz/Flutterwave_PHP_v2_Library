@@ -10,7 +10,7 @@ require_once('raveEventHandlerInterface.php');
 use Flutterwave\Rave;
 use Flutterwave\EventHandlerInterface;
 
-class subaccountEventHandler implements EventHandlerInterface{
+class recipientEventHandler implements EventHandlerInterface{
     /**
      * This is called only when a transaction is successful
      * */
@@ -71,20 +71,71 @@ class subaccountEventHandler implements EventHandlerInterface{
     }
 }
 
-class Subaccount {
-    protected $subaccount;
+
+class Recipient {
+    protected $recipient;
     function __construct(){
-        $this->subaccount = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->recipient = new Rave($_ENV['SECRET_KEY']);
     }
-    function subaccount($array){
+    function createRecipient($array){
             //set the payment handler 
-            $this->subaccount->eventHandler(new subaccountEventHandler)
+
+            if(!isset($array['account_number']) || !isset($array['account_bank'])){
+                return '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
+                The following body params are required <b> account_number and account_bank </b>
+              </div>';
+            }
+            $this->recipient->eventHandler(new recipientEventHandler)
             //set the endpoint for the api call
-            ->setEndPoint("v2/gpx/subaccounts/create");
+            ->setEndPoint("v3/beneficiaries");
             //returns the value from the results
-            return $this->subaccount->createSubaccount($array);
+            return $this->recipient->createBeneficiary($array);
         }
-}
 
+        function listRecipients(){
+            $this->recipient->eventHandler(new recipientEventHandler)
+            //set the endpoint for the api call
+            ->setEndPoint("v3/beneficiaries");
+            //returns the value from the results
+            return $this->recipient->getBeneficiaries();
+        } 
 
+        function fetchBeneficiary($array){
+            if(!isset($array['id'])){
+                return '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
+                The following PATH param is required :<b> id </b>
+              </div>';
+            }
+
+            if(gettype($array['id']) !== 'string'){
+                $array['id'] = (string) $array['id'];
+            }
+
+            $this->recipient->eventHandler(new recipientEventHandler)
+            //set the endpoint for the api call
+            ->setEndPoint("v3/beneficiaries/". $array['id']);
+            //returns the value from the results
+            return $this->recipient->getBeneficiaries();
+        }
+
+        function deleteBeneficiary($array){
+
+            if(!isset($array['id'])){
+                return '<div class="alert alert-danger" role="alert"> <b>Error:</b> 
+                The following PATH param is required :<b> id </b>
+              </div>';
+            }
+
+            if(gettype($array['id']) !== 'string'){
+                $array['id'] = (string) $array['id'];
+            }
+            
+            $this->recipient->eventHandler(new recipientEventHandler)
+            //set the endpoint for the api call
+            ->setEndPoint("v3/beneficiaries/". $array['id']);
+            //returns the value from the results
+            return $this->recipient->deleteBeneficiary();
+        }  
+
+    }
 ?>

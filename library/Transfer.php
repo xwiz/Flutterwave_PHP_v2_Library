@@ -75,14 +75,14 @@ class transferEventHandler implements EventHandlerInterface{
 class Transfer {
     protected $transfer;
     function __construct(){
-        $this->transfer = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->transfer = new Rave($_ENV['SECRET_KEY']);
     }
     //initiating a single transfer
     function singleTransfer($array){
         //set the payment handler 
         $this->transfer->eventHandler(new transferEventHandler)
         //set the endpoint for the api call
-        ->setEndPoint("v2/gpx/transfers/create");
+        ->setEndPoint("v3/transfers");
         //returns the value from the results
         return $this->transfer->transferSingle($array);
     }
@@ -92,10 +92,68 @@ class Transfer {
         //set the payment handler 
         $this->transfer->eventHandler(new transferEventHandler)
         //set the endpoint for the api call
-        ->setEndPoint("v2/gpx/transfers/create_bulk");
+        ->setEndPoint("v3/bulk-transfers");
         //returns the value from the results
         return $this->transfer->transferBulk($array);
     }
+
+    function listTransfers($array = array('url'=>'blank')){
+            $this->transfer->eventHandler(new transferEventHandler)
+        //set the endpoint for the api call
+            ->setEndPoint("v3/transfers");
+
+        return $this->transfer->listTransfers($array);
+        
+
+        //set the payment handler 
+        
+    }
+
+    function bulkTransferStatus($array){
+
+         //set the payment handler 
+         $this->transfer->eventHandler(new transferEventHandler)
+         //set the endpoint for the api call
+         ->setEndPoint("v3/bulk-transfers");
+
+         return $this->transfer->bulkTransferStatus($array);
+    }
+    function getTransferFee($array){
+
+        if(in_array('amount', $array) && gettype($array['amount']) !== "string"){
+            $array['amount'] = (string) $array['amount'];
+        }
+
+         //set the payment handler 
+         $this->transfer->eventHandler(new transferEventHandler)
+         //set the endpoint for the api call
+         ->setEndPoint("v3/transfers/fee");
+
+         return $this->transfer->applicableFees($array);
+    }
+
+
+
+    function getBanksForTransfer($data = array("country" => 'NG')){
+        
+           //set the payment handler 
+           $this->transfer->eventHandler(new transferEventHandler)
+           //set the endpoint for the api call
+
+           ->setEndPoint("v2/banks/".$data['country']."/");
+        
+        
+        return $this->transfer->getBanksForTransfer();
+    }
+
+
+    function verifyTransaction(){
+        //verify the charge
+        return $this->transfer->verifyTransaction($this->transfer->txref);//Uncomment this line if you need it
+    }
+
+
+
 
 }
 
