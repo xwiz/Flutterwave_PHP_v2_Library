@@ -91,9 +91,11 @@ class MobileMoney {
             ->setEndPoint("flwv3-pug/getpaidx/api/charge");
             //returns the value from the results
             $result = $this->payment->chargePayment($array);
-            if($result){
+            if($result['data']['authModelUsed']){
                   $this->payment->setAuthModel($result["data"]["authModelUsed"]);
                   return $result;
+            }else if($result['message'] === 'Momo initiated'){
+                header('Location:'.$result['data']['link']);
              }else{
                 return json_decode(array(
                     "error"=>"There was an error in charging this number"
