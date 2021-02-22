@@ -101,8 +101,7 @@ class Card {
                      $this->payment->setAuthModel("PIN");
                      $final_result =  $this->payment->chargePayment($array);
                  }
-                 else{
-                    
+                 if($result["data"]["suggested_auth"] === "NOAUTH_INTERNATIONAL"){
 
                     $this->payment->setAuthModel("NOAUTH_INTERNATIONAL");
                     $final_result =  $this->payment->chargePayment($array);
@@ -110,6 +109,15 @@ class Card {
                      //TODO: Update $this->options with the billing addres details
                      //$this->chargePayment($this->options) //uncomment this function when charging international cards
                  }
+                 if($result["data"]["suggested_auth"] === "AVS_VBVSECURECODE"){
+
+                    $this->payment->setAuthModel("AVS_VBVSECURECODE");
+                    $final_result =  $this->payment->chargePayment($array);
+     
+                     //TODO: Update $this->options with the billing addres details
+                     //$this->chargePayment($this->options) //uncomment this function when charging international cards
+                 }
+                 
              }else{
                   // $array["suggested_auth"] = "NOAUTH_INTERNATIONAL";
                 //   $this->payment->setAuthModel($result["data"]["authModelUsed"]);
