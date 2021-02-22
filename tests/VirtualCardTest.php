@@ -1,5 +1,5 @@
 <?php
-require("../lib/VirtualCards.php");
+require("lib/VirtualCards.php");
 use Flutterwave\VirtualCard;
 use \Mockery;
 use PHPUnit\Framework\TestCase;

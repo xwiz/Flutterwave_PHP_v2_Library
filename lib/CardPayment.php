@@ -85,6 +85,8 @@ class Card {
         $this->payment = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
     }
     function cardCharge($array){
+
+            $final_result = [];
             //set the payment handler 
             $this->payment->eventHandler(new cardEventHandler)
             //set the endpoint for the api call
@@ -97,23 +99,23 @@ class Card {
                  if($result["data"]["suggested_auth"] === "PIN"){
                      //validates the pin on the request data
                      $this->payment->setAuthModel("PIN");
-                     return $this->payment->chargePayment($array);
+                     $final_result =  $this->payment->chargePayment($array);
                  }
                  else{
                     
 
                     $this->payment->setAuthModel("NOAUTH_INTERNATIONAL");
-                    return $this->payment->chargePayment($array);
+                    $final_result =  $this->payment->chargePayment($array);
      
                      //TODO: Update $this->options with the billing addres details
                      //$this->chargePayment($this->options) //uncomment this function when charging international cards
                  }
              }else{
                   // $array["suggested_auth"] = "NOAUTH_INTERNATIONAL";
-                  $this->payment->setAuthModel($result["data"]["authModelUsed"]);
-                  return $result;
+                //   $this->payment->setAuthModel($result["data"]["authModelUsed"]);
+                  $final_result = $result;
              }
-            return $this;
+            return $final_result;
         }
 
          /**you will need to validate and verify the charge
@@ -128,7 +130,7 @@ class Card {
         }
         function verifyTransaction($txRef){
             //verify the charge
-            return $this->payment->verifyTransaction($txRef, $seckey=$_ENV['SECRET_KEY']);//Uncomment this line if you need it
+            return $this->payment->verifyTransaction($txRef, $_ENV['SECRET_KEY']);//Uncomment this line if you need it
         }
       
 

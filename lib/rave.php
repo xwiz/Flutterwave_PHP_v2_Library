@@ -3,7 +3,8 @@ namespace Flutterwave;
 
 // Prevent direct access to this class
 //defined('BASEPATH') OR exit('No direct script access allowed'); // Uncomment this link if you need this
-
+define("APPLICATION_FORMAT", "application/json");
+define("SECKEY_QUERY_PARAM", "?seckey=");
 require __DIR__.'/../vendor/autoload.php'; // Uncomment this autoloader if you need it
 
 
@@ -12,6 +13,8 @@ use Monolog\Handler\RotatingFileHandler;
 use Unirest\Request;
 use Unirest\Request\Body;
 use Dotenv;
+
+Request::verifyPeer(false); 
 
 $dotenv = new Dotenv\Dotenv(__DIR__.'/../');
 $dotenv->load();
@@ -115,7 +118,7 @@ class Rave {
      * */
     function createCheckSum(){
         $this->logger->notice('Generating Checksum....');
-        $options = array( 
+        $payload = array( 
             "PBFPubKey" => $this->publicKey, 
             "amount" => $this->amount, 
             "customer_email" => $this->customerEmail, 
@@ -134,13 +137,13 @@ class Rave {
             "hosted_payment" => 1
         );
         
-        ksort($options);
+        ksort($payload);
         
-        $this->transactionData = $options;
+        $this->transactionData = $payload;
         
         $hashedPayload = '';
         
-        foreach($options as $key => $value){
+        foreach($payload as $key => $value){
             $hashedPayload .= $value;
         }
         $completeHash = $hashedPayload.$this->secretKey;
@@ -535,7 +538,7 @@ class Rave {
         );
 
         // make request to endpoint using unirest.
-        $headers = array('Content-Type' => 'application/json');
+        $headers = array('Content-Type' => constant("APPLICATION_FORMAT"));
         $body = Body::json($data);
         $url = $this->baseUrl.'/flwv3-pug/getpaidx/api/xrequery';
 
@@ -618,9 +621,7 @@ class Rave {
 
         $seckeyadjusted = str_replace("FLWSECK-", "", $seckey);
         $seckeyadjustedfirst12 = substr($seckeyadjusted, 0, 12);
-
-        $encryptionkey = $seckeyadjustedfirst12.$hashedkeylast12;
-        return $encryptionkey;
+        return $seckeyadjustedfirst12.$hashedkeylast12;
 
     }
 
@@ -658,7 +659,7 @@ class Rave {
 
     function postURL($data){
         // make request to endpoint using unirest.
-        $headers = array('Content-Type' => 'application/json');
+        $headers = array('Content-Type' => constant("APPLICATION_FORMAT"));
         $body = Body::json($data);
         $url = $this->baseUrl.'/'.$this->end_point;
         $response = Request::post($url, $headers, $body);
@@ -674,7 +675,7 @@ class Rave {
 
      function getURL($url){
         // make request to endpoint using unirest.
-        $headers = array('Content-Type' => 'application/json');
+        $headers = array('Content-Type' => constant("APPLICATION_FORMAT"));
         //$body = Body::json($data);
         $path = $this->baseUrl.'/'.$this->end_point;
         $response = Request::get($path.$url, $headers);
@@ -692,9 +693,9 @@ class Rave {
             'txref' => $txRef,
             'SECKEY' => $seckey
             );
-            $result  = $this->postURL($this->post_data);
-            $result = json_decode($result,true);
-        return $result;
+        $result  = $this->postURL($this->post_data);
+             
+        return json_decode($result,true);
       
     }
 
@@ -713,8 +714,8 @@ class Rave {
                     'PBFPubKey' => $this->publicKey,
                     'transaction_reference' => $Ref,
                     'otp' => $otp);
-                $result  = $this->postURL($this->post_data);
-                return $result;
+                
+                return $this->postURL($this->post_data);
 
     }
 
@@ -726,8 +727,8 @@ class Rave {
                     'PBFPubKey' => $this->publicKey,
                     'transactionreference' => $Ref,
                     'otp' => $otp);
-                $result  = $this->postURL($this->post_data);
-                return $result;
+                 
+                return $this->postURL($this->post_data);
 
 
     }
@@ -745,8 +746,7 @@ class Rave {
     function getAllTransactions($array){
 
         $this->logger->notice('Getting all Transactions...');
-        $result = $this->postURL($array);
-        return $result;
+        return $this->postURL($array); 
 
     }
 
@@ -758,7 +758,7 @@ class Rave {
     function getAllSettlements(){
 
         $this->logger->notice('Getting all Subscription...');
-        $url = "?seckey=".$this->secretKey;
+        $url = constant("SECKEY_QUERY_PARAM").$this->secretKey;
         return $this->getURL($url);
 
     }
@@ -771,7 +771,7 @@ class Rave {
 
     function bvn($bvn){
         $this->logger->notice('Validating bvn...');
-        $url = "/".$bvn."?seckey=".$this->secretKey;
+        $url = "/".$bvn.constant("SECKEY_QUERY_PARAM").$this->secretKey;
         return $this->getURL($url);
      } 
 
@@ -781,9 +781,10 @@ class Rave {
      * */
 
     function getAllSubscription(){
+        //getALl Subscription
         $this->logger->notice('Getting all Subscription...');
-        $url = "?seckey=".$this->secretKey;
-        return $this->getURL($url);
+        $uri = constant("SECKEY_QUERY_PARAM").$this->secretKey;
+        return $this->getURL($uri);
      } 
 
         /**
@@ -794,7 +795,7 @@ class Rave {
 
     function fetchASubscription($data){
         $this->logger->notice('Fetching a Subscription...');
-        $url = "?seckey=".$this->secretKey."&transaction_id=".$data['transaction_id'];
+        $url = constant("SECKEY_QUERY_PARAM").$this->secretKey."&transaction_id=".$data['transaction_id'];
         return $this->getURL($url);
      }
      
@@ -806,7 +807,7 @@ class Rave {
 
     function fetchASettlement(){
         $this->logger->notice('Fetching a Subscription...');
-        $url = "?seckey=".$this->secretKey;
+        $url = constant("SECKEY_QUERY_PARAM").$this->secretKey;
         return $this->getURL($url);
      } 
 
@@ -942,8 +943,7 @@ class Rave {
         $this->options = $array;
         $this->logger->notice('Creating Sub account...');
         //pass $this->options to the postURL function to call the api
-        $result  = $this->postURL($this->options);
-        return $result;
+        return $this->postURL($this->options);
      }
 
     /**
@@ -966,8 +966,7 @@ class Rave {
     function createVirtualAccount($array){
         $this->options = $array;
         $this->logger->notice('creating virtual account..'); 
-        $result = $this->postURL($this->options);
-        return $result;
+        return $this->postURL($this->options);
     }
 
      /**
@@ -979,9 +978,9 @@ class Rave {
     function createOrder($array){
         $this->logger->notice('creating Ebill order for customer with email: '.$array['email']); 
 
-        if(empty($data['narration'])){
+        if(empty($array['narration'])){
             $array['narration'] = '';
-        }else if(empty($data['IP'])){
+        }else if(empty($array['IP'])){
             $array['IP'] = '10.30.205.3';
 
         }else if(!isset($array['custom_business_name']) || empty($array['custom_business_name'])){
@@ -1002,8 +1001,8 @@ class Rave {
             'country' => $array['country'],
             'custom_business_name' => $array['custom_business_name']
         );
-        $result = $this->postURL($data);
-        return $result;
+        
+        return $this->postURL($data);
     }
 
      /**
@@ -1021,8 +1020,8 @@ class Rave {
             'amount' => $array['amount'],
         );
 
-        $result = $this->postURL($data);
-        return $result;
+        
+        return $this->postURL($data);
     }
 
      /**
@@ -1095,21 +1094,21 @@ class Rave {
 
 
        
-            $result = $this->postUrl($data);
+            
         
 
-        return $result;
+        return $this->postUrl($data);
     }
 
     function bulkCharges($data){
         $this->logger->notice('bulk charging...');
         if(isset($data['title'])){
-        $url = "?seckey=".$this->secretKey."&&title=".$data['title'];
+        $url = constant("SECKEY_QUERY_PARAM").$this->secretKey."&&title=".$data['title'];
 
         }elseif(isset($data['batch_id'])){
-            $url = "?SECKEY=".$this->secretKey."&batch_id=".$data['batch_id'];
+            $url = constant("SECKEY_QUERY_PARAM").$this->secretKey."&batch_id=".$data['batch_id'];
         }else{
-        $url = "?seckey=".$this->secretKey;
+        $url = constant("SECKEY_QUERY_PARAM").$this->secretKey;
 
         }
         return $this->getURL($url);
@@ -1124,15 +1123,15 @@ class Rave {
      function listTransfers($data){
         $this->logger->notice('Fetching list of transfers...');
         if(isset($data['page'])){
-        $url = "?seckey=".$this->secretKey."&page=".$data['page'];
+        $url = constant("SECKEY_QUERY_PARAM").$this->secretKey."&page=".$data['page'];
 
         }else if(isset($data['page']) && isset($data['status'])){
-            $url = "?seckey=".$this->secretKey."&page".$data['page']."&status".$data['status'];
+            $url = constant("SECKEY_QUERY_PARAM").$this->secretKey."&page".$data['page']."&status".$data['status'];
         }else if(isset($data['status'])){
-        $url = "?seckey=".$this->secretKey."&status=".$data['status'];
+        $url = constant("SECKEY_QUERY_PARAM").$this->secretKey."&status=".$data['status'];
 
         }else{
-            $url = "?seckey=".$this->secretKey;
+            $url = constant("SECKEY_QUERY_PARAM").$this->secretKey;
 
         }
         return $this->getURL($url);
@@ -1144,9 +1143,9 @@ class Rave {
      * @return object
      * */
 
-     function fetchATransfer($data){
+     function fetchATransfer(){
         $this->logger->notice('Fetching a transfer and its details...');
-        $url = "?seckey=".$this->secretKey;
+        $url = constant("SECKEY_QUERY_PARAM").$this->secretKey;
 
         return $this->getURL($url);
      }
@@ -1160,9 +1159,57 @@ class Rave {
      function bulkTransferStatus($data){
 
         $this->logger->notice('Checking bulk transfer status...');
-        $url = "?seckey=".$this->secretKey."&batch_id=".$data['batch_id'];
+        $url = constant("SECKEY_QUERY_PARAM").$this->secretKey."&batch_id=".$data['batch_id'];
         return $this->getURL($url);
      }
+
+     /**
+     * This helps you retry a failed transfer attempt.
+     * @param string $id
+     * @return object
+     * */
+     function retryTransfer($id){
+
+        $data = [
+            'id' => $id,
+            'seckey' => $this->secretKey
+        ];
+
+        $this->logger->notice('Retrying Transfer with Id..'.$id.'...');
+
+        return $this->postURL($data);
+     }
+
+    /**
+     * Fetch transfer retries.
+     * @return object
+     * */
+     function fetchTransferRetries(){
+
+        $this->logger->notice('fetching tranfer retries for the id ...');
+        $url = '';
+        return $this->getURL($url);
+     }
+
+    /**
+    * wallet to wallet merchant transfer.
+    * @param string $data
+    * @return object
+    * */
+
+    function merchantTransfer($data){
+
+        $payload = [
+            'merchant_id' => $data['merchant_id'],
+            'amount' => $data['amount'],
+            'seckey' => $this->secretKey,
+            'currency' => $data['currency']
+        ];
+
+        $this->logger->notice('wallet to wallet transfer initiated to merchant id:'.$payload['merchant_id']);
+        return $this->postURL($payload);
+
+    }
 
       /**
      * Check applicable fees with this method
@@ -1173,7 +1220,7 @@ class Rave {
      function applicableFees($data){
 
         $this->logger->notice('Fetching applicable fees...');
-        $url = "?seckey=".$this->secretKey."&currency=".$data['currency']."&amount=".$data['amount'];
+        $url = constant("SECKEY_QUERY_PARAM").$this->secretKey."&currency=".$data['currency']."&amount=".$data['amount'];
         return $this->getURL($url);
      }
 
@@ -1185,8 +1232,8 @@ class Rave {
 
      function getTransferBalance($array){
         $this->logger->notice('Fetching Transfer Balance...');
-        if(empty($array['currency'])){
-            $array['currency'] == 'NGN';
+        if(empty($array['currency']) || !isset($array['currency'])){
+            $array['currency'] = 'NGN';
         }
         $data = array(
             "seckey"=>$this->secretKey,
@@ -1205,8 +1252,8 @@ class Rave {
 
         $this->logger->notice('Verifying transfer recipents account...');
         if(empty($array['currency']) && empty($array['country'])){
-            $array['currency'] == '';
-            $array['country'] == '';
+            $array['currency'] = '';
+            $array['country'] = '';
         }
 
         $data = array(
@@ -1231,8 +1278,8 @@ class Rave {
 
           //get banks for transfer
         $url = "?public_key=".$this->publickey;
-        $result = $this->getURL($url);
 
+        return  $this->getURL($url);
      }
 
       /**
