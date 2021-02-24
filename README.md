@@ -304,18 +304,6 @@ $array = array(
     $result = $payment->singleTransfer($array);
     //$result = $payment->bulkTransfer($array);
     //$result = $payment->listTransfers($array);
-    //$result = $payment->fetchATransfer($array);
-    //$result = $payment->bulkTransferStatus($array);
-    //$result = $payment->getApplicableFees($array);
-    //$result = $payment->getTransferBalance($array);
-    //$result = $payment->verifyAccount($array);
-    //$result = $payment->transferRetry($array);
-    //$result = $payment->fetchTransferRetries($array);
-    //$result = $payment->walletToWalletTransfer($array);
-    //$result = $payment->verifyTransaction($array);
-    //$result = $payment->getBanksForTransfer(['country' => 'NG']); //if array is no specified default: NG
-
-    
     print_r($result);
 ```
 
