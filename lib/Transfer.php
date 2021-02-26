@@ -3,6 +3,13 @@ namespace Flutterwave;
 
 //uncomment if you need this
 //define("BASEPATH", 1);//Allow direct access to rave.php and raveEventHandler.php
+define("CREATE_TRANSFER_ENDPOINT", "v2/gpx/transfers/create");
+define("BULK_TRANSFER_ENDPOINT", "v2/gpx/transfers/create_bulk");
+define("GET_TRANSFER_ENDPOINT", "v2/gpx/transfers");
+define("TRANSFER_APPLICABLE_FEE", "v2/gpx/transfers/fee");
+define("TRANSFER_BALANCE", "v2/gpx/balance");
+define("TRANSFER_RETRY_ENDPOINT", "v2/gpx/transfers/retry");
+define("WALLET_TO_WALLET_TRANSFER", "v2/gpx/transfers/wallet");
 
 require_once('rave.php');
 require_once('raveEventHandlerInterface.php');
@@ -77,14 +84,17 @@ class Transfer {
     function __construct(){
         $this->transfer = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
     }
+
+
     //initiating a single transfer
     function singleTransfer($array){
         //set the payment handler 
         $this->transfer->eventHandler(new transferEventHandler)
         //set the endpoint for the api call
-        ->setEndPoint("v2/gpx/transfers/create");
+        ->setEndPoint(constant("CREATE_TRANSFER_ENDPOINT"));
         //returns the value from the results
-        return $this->transfer->transferSingle($array);
+        return $this->renderResult($this->transfer->transferSingle($array));
+
     }
 
      //initiating a bulk transfer
@@ -92,9 +102,9 @@ class Transfer {
         //set the payment handler 
         $this->transfer->eventHandler(new transferEventHandler)
         //set the endpoint for the api call
-        ->setEndPoint("v2/gpx/transfers/create_bulk");
+        ->setEndPoint(constant("BULK_TRANSFER_ENDPOINT"));
         //returns the value from the results
-        return $this->transfer->transferBulk($array);
+        return $this->renderResult($this->transfer->transferBulk($array));
     }
 
     function listTransfers($array){
@@ -102,9 +112,10 @@ class Transfer {
         //set the payment handler 
         $this->transfer->eventHandler(new transferEventHandler)
         //set the endpoint for the api call
-        ->setEndPoint("v2/gpx/transfers");
+        ->setEndPoint(constant("GET_TRANSFER_ENDPOINT"));
 
-        return $this->transfer->listTransfers($array);
+        return $this->renderResult($this->transfer->listTransfers($array));
+        
     }
 
     function fetchATransfer($array){
@@ -112,28 +123,31 @@ class Transfer {
         //set the payment handler 
         $this->transfer->eventHandler(new transferEventHandler)
         //set the endpoint for the api call
-        ->setEndPoint("v2/gpx/transfers");
+        ->setEndPoint(constant("GET_TRANSFER_ENDPOINT"));
 
-        return $this->transfer->fetchATransfer($array);
+        return $this->renderResult($this->transfer->fetchATransfer());
+        
     }
 
-    function bulkTransferStatus(){
+    function bulkTransferStatus($array){
 
          //set the payment handler 
          $this->transfer->eventHandler(new transferEventHandler)
          //set the endpoint for the api call
-         ->setEndPoint("v2/gpx/transfers");
+         ->setEndPoint(constant("GET_TRANSFER_ENDPOINT"));
 
-         return $this->transfer->bulkTransferStatus($array);
+         return $this->renderResult($this->transfer->bulkTransferStatus($array));
     }
-    function getApplicableFees(){
+
+    function getApplicableFees($array){
 
          //set the payment handler 
          $this->transfer->eventHandler(new transferEventHandler)
          //set the endpoint for the api call
-         ->setEndPoint("v2/gpx/transfers/fee");
+         ->setEndPoint(constant("TRANSFER_APPLICABLE_FEE"));
 
-         return $this->transfer->applicableFees($array);
+         return $this->renderResult($this->transfer->applicableFees($array));
+         
     }
 
     function getTransferBalance($array){
@@ -141,13 +155,13 @@ class Transfer {
         //set the payment handler 
         $this->transfer->eventHandler(new transferEventHandler)
         //set the endpoint for the api call
-        ->setEndPoint("v2/gpx/balance");
+        ->setEndPoint(constant("TRANSFER_BALANCE"));
 
         if(!isset($array['currency'])){
             $array['currency'] = 'NGN';
         }
 
-        return $this->transfer->getTransferBalance($array);
+        return $this->renderResult($this->transfer->getTransferBalance($array));
 
     }
 
@@ -158,9 +172,8 @@ class Transfer {
         //set the endpoint for the api call
         ->setEndPoint("flwv3-pug/getpaidx/api/resolve_account");
 
-
-        return $this->transfer->verifyAccount($array);
-
+        return $this->renderResult($this->transfer->verifyAccount($array));
+        
     }
 
     function getBanksForTransfer($data = array("country" => 'NG')){
@@ -171,8 +184,77 @@ class Transfer {
 
            ->setEndPoint("v2/banks/".$data['country']."/");
         
+
+        return $this->renderResult($this->transfer->getBanksForTransfer());
+    }
+
+    function transferRetry($id){
+        $this->transfer->eventHandler(new transferEventHandler)
+        ->setEndPoint(constant("TRANSFER_RETRY_ENDPOINT"));
+
+        return $this->renderResult($this->transfer->retryTransfer($id));
         
-        return $this->transfer->getBanksForTransfer();
+    }
+
+    function fetchTransferRetries($id){
+
+                //set the payment handler 
+                $this->transfer->eventHandler(new transferEventHandler)
+                //set the endpoint for the api call
+                ->setEndPoint("v2/gpx/transfers/".$id."/retries");
+        
+                return $this->renderResult($this->transfer->fetchTransferRetries());
+    }
+
+
+    function walletToWalletTransfer($data){
+
+        //set the payment handler 
+        $this->transfer->eventHandler(new transferEventHandler)
+        //set the endpoint for the api call
+        ->setEndPoint(constant("WALLET_TO_WALLET_TRANSFER"));
+    
+         function checkPayload($data){
+             $error = '';
+            if(array_key_exists('amount', $data) || empty($data['amount'])){
+                if(array_key_exists('currency', $data) || empty($data['currency'])){
+                    if(array_key_exists('merchant_id', $data) || empty($data['merchant_id'])){
+
+                        return $this->renderResult($this->transfer->merchantTransfer($data));
+                        
+                    }else{
+                        $error .=  'Please add a "merchant_id" to the payload <br />';
+                    }
+                }else{
+                    $error .= 'Please add currency code to the payload <br/>';
+                }
+            }else{
+                $error .= 'Please add an amount value to the payload';
+            }
+
+            return $error;
+         } 
+
+
+         checkPayload($data);
+       
+
+        
+    }
+
+    function verifyTransaction($txRef){
+        //verify the charge
+        return $this->renderResult($this->transfer->verifyTransaction($txRef, $_ENV['SECRET_KEY']));  
+    }
+
+    function renderResult($result){
+        
+        $result = json_decode($result, TRUE);
+        if($result['status'] == 'error'){
+
+            return $result['message'];
+        }
+        return $result;
     }
 
 

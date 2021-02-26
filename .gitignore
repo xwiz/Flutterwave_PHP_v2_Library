@@ -2,4 +2,4 @@
 .*
 vendor/*
 .env
- 
+ docs/packages/Default.html

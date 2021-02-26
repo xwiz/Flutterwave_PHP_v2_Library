@@ -283,6 +283,30 @@ $array = array(
     $result = $mobilemoney->mobilemoney($array);
     $print_r($result);
 ```
+## Transfer
+
+The following implementation shows how to initiate a transfer
+```php
+require("Flutterwave-Rave-PHP-SDK/lib/Transfer.php");
+use Flutterwave\Transfer;
+
+$array = array(
+  "account_bank" => "044",
+  "account_number" => "0690000044",
+  "amount" => 500,
+  "seckey" => "FLWSECK-67fexxxxxxxxxxxxxxxxxx9922512-X",
+  "narration" => "New transfer",
+  "currency" => "NGN",
+  "reference" => "mk-902837-jk",
+  "beneficiary_name" => "Kwame Adew" // only pass this for non NGN 
+);
+    $payment = new Transfer();
+    $result = $payment->singleTransfer($array);
+    //$result = $payment->bulkTransfer($array);
+    //$result = $payment->listTransfers($array);
+    print_r($result);
+```
+
 ## Create Vitual Cards
 
 The following implementation shows how to create virtual cards on rave
