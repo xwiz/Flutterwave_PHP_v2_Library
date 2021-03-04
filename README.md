@@ -564,7 +564,7 @@ require("Flutterwave-Rave-PHP-SDK/lib/TokenizedCharge.php");
 use Flutterwave\TokenizedCharge;
 
 $array = array(
-"SECKEY":"FLWSECK-e6db11d1f8a6208de8cb2f94e293450e-X",
+"SECKEY":"FLWSECK-xxxxxxxxxxx-X",
 "token":"flw-t1nf-404dff6823ff91ce154f04dd40085b9e-m03k",
 "currency":"NGN",
 "country":"NG",
