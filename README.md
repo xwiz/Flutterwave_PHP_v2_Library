@@ -528,7 +528,7 @@ require("Flutterwave-Rave-PHP-SDK/lib/Preauth.php");
 use Flutterwave\Preauth;
 
 $array = array(
-"PBFPubKey"=> "FLWPUBK-7adb6177bd71dd43c2efa3f1229e3b7f-X",
+"PBFPubKey"=> "FLWPUBK-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-X",
   "cardno"=> "5438898014560229",
   "charge_type"=> "preauth",
   "cvv"=> "812",
