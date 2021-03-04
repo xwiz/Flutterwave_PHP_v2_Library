@@ -7,7 +7,7 @@ class AccountPaymentTest extends TestCase
 {
     function test_keys_supplied_for_account_charge(){
         $data = [
-            "PBFPubKey" => "FLWPUBK-7adb6177bd71dd43c2efa3f1229e3b7f-X",
+            "PBFPubKey" => "FLWPUBK-xxxxxxxxxxxxxxxxxxxxx-X",
             "accountbank" => "232",// get the bank code from the bank list endpoint.
             "accountnumber" => "0061333471",
             "currency" => "NGN",
