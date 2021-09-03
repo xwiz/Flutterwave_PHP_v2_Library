@@ -12,6 +12,7 @@
     "require": {
         "php": ">=7.0.0",
         "monolog/monolog": "^2.0",
+        "vlucas/phpdotenv": "5.2.0",
         "mashape/unirest-php": "^3.0"
     },
     "require-dev": {
