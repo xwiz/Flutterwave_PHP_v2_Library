@@ -26,7 +26,7 @@ interface EventHandlerInterface{
     function onFailure($transactionData);
     
     /**
-     * This is called when a transaction is requeryed from the payment gateway
+     * This is called when a transaction is Requeried from the payment gateway
      * @param string $transactionReference This is the transaction reference as returned from the Rave payment gateway
      * */
     function onRequery($transactionReference);

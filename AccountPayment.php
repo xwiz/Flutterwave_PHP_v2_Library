@@ -43,7 +43,7 @@ class accountEventHandler implements EventHandlerInterface{
     }
     
     /**
-     * This is called when a transaction is requeryed from the payment gateway
+     * This is called when a transaction is Requeried from the payment gateway
      * */
     function onRequery($transactionReference){
         // Do something, anything!
@@ -81,7 +81,7 @@ class Account {
     protected $payment;
 
     function __construct(){
-        $this->payment = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->payment = new Rave(fl_get_config('public_key'), fl_get_config('secret_key'), fl_get_config('environment'));
     }
     function accountCharge($array){
             //set the payment handler 
@@ -106,7 +106,7 @@ class Account {
     function verifyTransaction($txRef){
            //verify the charge
         $this->payment->eventHandler(new accountEventHandler);
-        return $this->payment->verifyTransaction($txRef, $_ENV['SECRET_KEY']);//Uncomment this line if you need it
+        return $this->payment->verifyTransaction($txRef, fl_get_config('secret_key'));//Uncomment this line if you need it
        }
     }
 ?>

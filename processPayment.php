@@ -108,7 +108,7 @@ class myEventHandler implements EventHandlerInterface{
     }
     
     /**
-     * This is called when a transaction is requeryed from the payment gateway
+     * This is called when a transaction is Requeried from the payment gateway
      * */
     function onRequery($transactionReference){
         // Do something, anything!

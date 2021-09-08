@@ -548,20 +548,20 @@ class Rave {
         //check the status is success
         if ($response->body && $response->body->status === "success") {
             if($response->body && $response->body->data && $response->body->data->status === "successful"){
-               $this->logger->notice('Requeryed a successful transaction....'.json_encode($response->body->data));
+               $this->logger->notice('Requeried a successful transaction....'.json_encode($response->body->data));
                 // Handle successful
                 if(isset($this->handler)){
                     $this->handler->onSuccessful($response->body->data);
                 }
             }elseif($response->body && $response->body->data && $response->body->data->status === "failed"){
                 // Handle Failure
-                $this->logger->warn('Requeryed a failed transaction....'.json_encode($response->body->data));
+                $this->logger->warn('Requeried a failed transaction....'.json_encode($response->body->data));
                 if(isset($this->handler)){
                     $this->handler->onFailure($response->body->data);
                 }
             }else{
                 // Handled an undecisive transaction. Probably timed out.
-                $this->logger->warn('Requeryed an undecisive transaction....'.json_encode($response->body->data));
+                $this->logger->warn('Requeried an undecisive transaction....'.json_encode($response->body->data));
                 // I will requery again here. Just incase we have some devs that cannot setup a queue for requery. I don't like this.
                 if($this->requeryCount > 4){
                     // Now you have to setup a queue by force. We couldn't get a status in 5 requeries.
@@ -729,20 +729,12 @@ class Rave {
                     'otp' => $otp);
                  
                 return $this->postURL($this->post_data);
-
-
     }
-    
-                
-            
-        
-    
 
       /**
      * Get all Transactions
      *  @return object
      * */
-
     function getAllTransactions($array){
 
         $this->logger->notice('Getting all Transactions...');
@@ -754,7 +746,6 @@ class Rave {
      * Get all Settlements
      *  @return object
      * */
-
     function getAllSettlements(){
 
         $this->logger->notice('Getting all Subscription...');
@@ -768,7 +759,6 @@ class Rave {
      *  @param string
      *  @return object
      * */
-
     function bvn($bvn){
         $this->logger->notice('Validating bvn...');
         $url = "/".$bvn.constant("SECKEY_QUERY_PARAM").$this->secretKey;
@@ -779,7 +769,6 @@ class Rave {
      * Get all Subscription
      *  @return object
      * */
-
     function getAllSubscription(){
         //getALl Subscription
         $this->logger->notice('Getting all Subscription...');
@@ -792,7 +781,6 @@ class Rave {
      * @param $id,$email
      *  @return object
      * */
-
     function fetchASubscription($data){
         $this->logger->notice('Fetching a Subscription...');
         $url = constant("SECKEY_QUERY_PARAM").$this->secretKey."&transaction_id=".$data['transaction_id'];
@@ -804,7 +792,6 @@ class Rave {
      * @param $id,$email
      *  @return object
      * */
-
     function fetchASettlement(){
         $this->logger->notice('Fetching a Subscription...');
         $url = constant("SECKEY_QUERY_PARAM").$this->secretKey;
@@ -815,7 +802,6 @@ class Rave {
      * activating  a subscription
      *  @return object
      * */
-
     function activateSubscription(){
         $this->logger->notice('Activating Subscription...');
         $data = array(
@@ -855,7 +841,6 @@ class Rave {
      function transferSingle($array){
         $this->logger->notice('Processing transfer...');
          return $this->postURL($array);
-         
      }
 
 
@@ -868,7 +853,6 @@ class Rave {
     function transferBulk($array){
         $this->logger->notice('Processing bulk transfer...');
          return $this->postURL($array);
-         
      }
 
       /**
@@ -880,7 +864,6 @@ class Rave {
     function refund($array){
         $this->logger->notice('Initiating a refund...');
          return $this->postURL($array);
-         
      }
 
 
@@ -917,13 +900,13 @@ class Rave {
         }
         //passes the result to the suggestedAuth function which re-initiates the charge 
         return $result;
-     } 
+     }
+
      /**
      * sends a post request to the virtual APi set by the user
      *  @param array
      *  @return object
      * */
-
      function vcPostRequest($array){
         $this->post_data = $array;
         //post the data to the API
@@ -932,8 +915,8 @@ class Rave {
         $result = json_decode($result, true);
         //return result
         print_r($result);
-       // return $result;
-     }   
+     }
+
     /**
          * Used to create sub account on the rave dashboard
          *  @param array
@@ -1001,7 +984,7 @@ class Rave {
             'country' => $array['country'],
             'custom_business_name' => $array['custom_business_name']
         );
-        
+
         return $this->postURL($data);
     }
 
@@ -1020,7 +1003,6 @@ class Rave {
             'amount' => $array['amount'],
         );
 
-        
         return $this->postURL($data);
     }
 
@@ -1029,7 +1011,6 @@ class Rave {
      * @param string $array
      * @return object
      * */
-
     function bill($array){
         $this->logger->notice(' billing ...');
 
@@ -1048,26 +1029,26 @@ class Rave {
             $data["service_payload"]["IsAirtime"] = $array["service_payload"]["IsAirtime"];
             $data["service_payload"]["BillerName"] = $array["service_payload"]["BillerName"];
       
-        }else if($array["service"] == 'fly_buy_bulk'){
-        $this->logger->notice('fly_buy_bulk bill...');
+        } else if($array["service"] == 'fly_buy_bulk'){
+            $this->logger->notice('fly_buy_bulk bill...');
 
             $data["service_payload"]["BatchReference"] = $array["service_payload"]["BatchReference"];
             $data["service_payload"]["CallBackUrl"] = $array["service_payload"]["CallBackUrl"];
             $data["service_payload"]["Requests"] = $array["service_payload"]["Requests"];//an array
-        }else if($array["service"] == 'fly_history'){
-        $this->logger->notice('fly_history bill...');
+        } else if($array["service"] == 'fly_history'){
+            $this->logger->notice('fly_history bill...');
             $data["service_payload"]["FromDate"] = $array["service_payload"]["FromDate"];
             $data["service_payload"]["ToDate"] = $array["service_payload"]["ToDate"];
             $data["service_payload"]["PageSize"] = $array["service_payload"]["PageSize"];
             $data["service_payload"]["PageIndex"] = $array["service_payload"]["PageIndex"];
             $data["service_payload"]["Reference"] = $array["service_payload"]["Reference"];
-        }else if($array["service"] == 'fly_recurring_cancel'){
-        $this->logger->notice('fly_recurring cancel bill...');
+        } else if($array["service"] == 'fly_recurring_cancel'){
+            $this->logger->notice('fly_recurring cancel bill...');
 
             $data["service_payload"]["CustomerMobile"] = $array["service_payload"]["CustomerMobile"];
             $data["service_payload"]["RecurringPayment"] = $array["service_payload"]["RecurringPayment"];//Id of the recurring payment to be cancelled.
-        }else if($array["service"] == 'fly_remita_create-order'){
-        $this->logger->notice('fly_remita_create-order...');
+        } else if($array["service"] == 'fly_remita_create-order'){
+            $this->logger->notice('fly_remita_create-order...');
 
             $data["service_payload"]["billercode"] = $array["service_payload"]["billercode"];
             $data["service_payload"]["productcode"] = $array["service_payload"]["productcode"];
@@ -1075,28 +1056,20 @@ class Rave {
             $data["service_payload"]["transactionreference"] = $array["service_payload"]["transactionreference"];
             $data["service_payload"]["payer"] = $array["service_payload"]["payer"];
             $data["service_payload"]["fields"] = $array["service_payload"]["fields"];
-        }else if($array["service"] == 'fly_remita_pay-order'){
-        $this->logger->notice('fly_remita_pay-order...');
+        } else if($array["service"] == 'fly_remita_pay-order'){
+            $this->logger->notice('fly_remita_pay-order...');
 
             $data["service_payload"]["orderreference"] = $array["service_payload"]["orderreference"];
             $data["service_payload"]["paymentreference"] = $array["service_payload"]["paymentreference"];
             $data["service_payload"]["amount"] = $array["service_payload"]["amount"];
         }
 
-
-        
-            $data["secret_key"] = $this->secretKey;
-            $data["service"] = $array["service"];
-            $data["service_method"] = $array["service_method"];
-            $data["service_version"] = $array["service_version"];
-            $data["service_channel"] = "rave";
+        $data["secret_key"] = $this->secretKey;
+        $data["service"] = $array["service"];
+        $data["service_method"] = $array["service_method"];
+        $data["service_version"] = $array["service_version"];
+        $data["service_channel"] = "rave";
     
-
-
-       
-            
-        
-
         return $this->postUrl($data);
     }
 
@@ -1265,7 +1238,6 @@ class Rave {
             
         );
         return $this->postURL($data);
-
      }
 
       /**
@@ -1315,14 +1287,7 @@ class Rave {
             "SECKEY"=> $this->secretkey  
         );
         return $this->postURL($data);
-     }
-
-    
-
-    
-
-
-    
+     }    
 }
 
 // silencio es dorado

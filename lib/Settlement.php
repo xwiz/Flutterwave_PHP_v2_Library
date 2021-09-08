@@ -36,7 +36,7 @@ class settlementEventHandler implements EventHandlerInterface{
     }
     
     /**
-     * This is called when a transaction is requeryed from the payment gateway
+     * This is called when a transaction is Requeried from the payment gateway
      * */
     function onRequery($transactionReference){
         // Do something, anything!
@@ -71,7 +71,7 @@ class settlementEventHandler implements EventHandlerInterface{
 
 class Settlement {
     function __construct(){
-        $this->settle = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->settle = new Rave(fl_get_config('public_key'), fl_get_config('secret_key'), fl_get_config('environment'));
     }
 
     function fetchSettlement($array){

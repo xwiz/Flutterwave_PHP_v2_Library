@@ -38,7 +38,7 @@ class bvnEventHandler implements EventHandlerInterface{
     }
     
     /**
-     * This is called when a transaction is requeryed from the payment gateway
+     * This is called when a transaction is Requeried from the payment gateway
      * */
     function onRequery($transactionReference){
         // Do something, anything!
@@ -74,7 +74,7 @@ class bvnEventHandler implements EventHandlerInterface{
 class Bvn {
     protected $bvn;
     function __construct(){
-        $this->bvn = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->bvn = new Rave(fl_get_config('public_key'), fl_get_config('secret_key'), fl_get_config('environment'));
     }
     function verifyBVN($bvn){
             //set the payment handler 

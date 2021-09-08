@@ -42,7 +42,7 @@ class billEventHandler implements EventHandlerInterface{
     }
     
     /**
-     * This is called when a transaction is requeryed from the payment gateway
+     * This is called when a transaction is Requeried from the payment gateway
      * */
     function onRequery($transactionReference){
         // Do something, anything!
@@ -82,7 +82,7 @@ class Bill {
     protected $payment;
 
     function __construct(){
-        $this->payment = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->payment = new Rave(fl_get_config('public_key'), fl_get_config('secret_key'), fl_get_config('environment'));
     }
    
     function payBill($array){

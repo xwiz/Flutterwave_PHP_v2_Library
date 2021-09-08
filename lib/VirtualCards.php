@@ -12,7 +12,7 @@ class VirtualCard {
     protected $vc;
     //initialise the constructor
     function __construct(){
-        $this->vc = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->vc = new Rave(fl_get_config('public_key'), fl_get_config('secret_key'), fl_get_config('environment'));
     }
     //create card function
     function create($array){

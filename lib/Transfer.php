@@ -46,7 +46,7 @@ class transferEventHandler implements EventHandlerInterface{
     }
     
     /**
-     * This is called when a transaction is requeryed from the payment gateway
+     * This is called when a transaction is Requeried from the payment gateway
      * */
     function onRequery($transactionReference){
         // Do something, anything!
@@ -82,7 +82,7 @@ class transferEventHandler implements EventHandlerInterface{
 class Transfer {
     protected $transfer;
     function __construct(){
-        $this->transfer = new Rave($_ENV['PUBLIC_KEY'], $_ENV['SECRET_KEY'], $_ENV['ENV']);
+        $this->transfer = new Rave(fl_get_config('public_key'), fl_get_config('secret_key'), fl_get_config('environment'));
     }
 
 
@@ -244,7 +244,7 @@ class Transfer {
 
     function verifyTransaction($txRef){
         //verify the charge
-        return $this->renderResult($this->transfer->verifyTransaction($txRef, $_ENV['SECRET_KEY']));  
+        return $this->renderResult($this->transfer->verifyTransaction($txRef, fl_get_config('secret_key')));  
     }
 
     function renderResult($result){
