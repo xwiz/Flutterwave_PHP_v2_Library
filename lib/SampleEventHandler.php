@@ -2,7 +2,7 @@
 
 namespace Flutterwave;
 
-class BaseEventHandler implements EventHandlerInterface{
+class SampleEventHandler implements EventHandlerInterface{
      /**
      * This is called only when a transaction is successful
      * */

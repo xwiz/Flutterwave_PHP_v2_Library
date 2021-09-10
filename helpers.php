@@ -1,7 +1,5 @@
 <?php
 
-use Dotenv;
-
 function fl_get_config($key)
 {
     switch($key) {

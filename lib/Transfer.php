@@ -117,28 +117,24 @@ class Transfer {
         //set the endpoint for the api call
         $this->transfer->setEndPoint(constant("WALLET_TO_WALLET_TRANSFER"));
     
-         public function checkPayload($data){
-             $error = '';
-            if(array_key_exists('amount', $data) || empty($data['amount'])){
-                if(array_key_exists('currency', $data) || empty($data['currency'])){
-                    if(array_key_exists('merchant_id', $data) || empty($data['merchant_id'])){
+        $error = '';
+        if(array_key_exists('amount', $data) || empty($data['amount'])){
+            if(array_key_exists('currency', $data) || empty($data['currency'])){
+                if(array_key_exists('merchant_id', $data) || empty($data['merchant_id'])){
 
-                        return $this->renderResult($this->transfer->merchantTransfer($data));
-                        
-                    }else{
-                        $error .=  'Please add a "merchant_id" to the payload <br />';
-                    }
+                    return $this->renderResult($this->transfer->merchantTransfer($data));
+                    
                 }else{
-                    $error .= 'Please add currency code to the payload <br/>';
+                    $error .=  'Please add a "merchant_id" to the payload <br />';
                 }
             }else{
-                $error .= 'Please add an amount value to the payload';
+                $error .= 'Please add currency code to the payload <br/>';
             }
+        }else{
+            $error .= 'Please add an amount value to the payload';
+        }
 
-            return $error;
-         } 
-
-         checkPayload($data);   
+        return $error;
     }
 
     public function verifyTransaction($txRef){

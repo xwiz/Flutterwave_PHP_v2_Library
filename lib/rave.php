@@ -1005,11 +1005,6 @@ class Rave {
     public function bill($array){
         $this->logger->notice(' billing ...');
 
-        public function startsWith($haystack, $needle)
-            {
-                 $length = strlen($needle);
-                 return (substr($haystack, 0, $length) === $needle);
-            }
         $data = array();
         if($array["service"] == 'fly_buy'){
         $this->logger->notice('fly_buy bill...');
