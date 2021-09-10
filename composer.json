@@ -7,7 +7,10 @@
     "autoload": {
         "psr-4": {
             "Flutterwave\\": "lib/"
-        }
+        },
+        "files": [
+            "helpers.php"
+        ]
     },
     "require": {
         "php": ">=7.0.0",
@@ -19,10 +22,8 @@
         "phpunit/phpunit": "^7"
     },
     "license": "MIT",
-    "authors": [
-        {
-            "name": "Flutterwave Developers",
-            "email": "developers@flutterwavego.com"
-        }
-    ]
+    "authors": [{
+        "name": "Flutterwave Developers",
+        "email": "developers@flutterwavego.com"
+    }]
 }

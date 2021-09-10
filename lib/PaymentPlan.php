@@ -1,11 +1,7 @@
 <?php
 namespace Flutterwave;
 
-//uncomment if you need this
-//define("BASEPATH", 1);//Allow direct access to rave.php and raveEventHandler.php
 
-require_once('rave.php');
-require_once('raveEventHandlerInterface.php');
 
 use Flutterwave\Rave;
 use Flutterwave\EventHandlerInterface;
@@ -14,7 +10,7 @@ class paymentPlanEventHandler implements EventHandlerInterface{
     /**
      * This is called only when a transaction is successful
      * */
-    function onSuccessful($transactionData){
+    public function onSuccessful($transactionData){
         // Get the transaction from your DB using the transaction reference (txref)
         // Check if you have previously given value for the transaction. If you have, redirect to your successpage else, continue
         // Comfirm that the transaction is successful
@@ -30,7 +26,7 @@ class paymentPlanEventHandler implements EventHandlerInterface{
     /**
      * This is called only when a transaction failed
      * */
-    function onFailure($transactionData){
+    public function onFailure($transactionData){
         // Get the transaction from your DB using the transaction reference (txref)
         // Update the db transaction record (includeing parameters that didn't exist before the transaction is completed. for audit purpose)
         // You can also redirect to your failure page from here
@@ -40,21 +36,21 @@ class paymentPlanEventHandler implements EventHandlerInterface{
     /**
      * This is called when a transaction is Requeried from the payment gateway
      * */
-    function onRequery($transactionReference){
+    public function onRequery($transactionReference){
         // Do something, anything!
     }
     
     /**
      * This is called a transaction requery returns with an error
      * */
-    function onRequeryError($requeryResponse){
+    public function onRequeryError($requeryResponse){
         // Do something, anything!
     }
     
     /**
      * This is called when a transaction is canceled by the user
      * */
-    function onCancel($transactionReference){
+    public function onCancel($transactionReference){
         // Do something, anything!
         // Note: Somethings a payment can be successful, before a user clicks the cancel button so proceed with caution
        
@@ -63,7 +59,7 @@ class paymentPlanEventHandler implements EventHandlerInterface{
     /**
      * This is called when a transaction doesn't return with a success or a failure response. This can be a timedout transaction on the Rave server or an abandoned transaction by the customer.
      * */
-    function onTimeout($transactionReference, $data){
+    public function onTimeout($transactionReference, $data){
         // Get the transaction from your DB using the transaction reference (txref)
         // Queue it for requery. Preferably using a queue system. The requery should be about 15 minutes after.
         // Ask the customer to contact your support and you should escalate this issue to the flutterwave support team. Send this as an email and as a notification on the page. just incase the page timesout or disconnects
@@ -74,12 +70,12 @@ class paymentPlanEventHandler implements EventHandlerInterface{
 
 class PaymentPlan{
     protected $plan;
-    function __construct(){
+    public function __construct(){
         $this->plan = new Rave(fl_get_config('public_key'), fl_get_config('secret_key'), fl_get_config('environment'));
     }
-    function createPlan($array){
-            //set the payment handler 
-            $this->plan->eventHandler(new paymentPlanEventHandler)
+    public function createPlan($array){
+    
+            $this->plan->setEventHandler(new paymentPlanEventHandler)
             //set the endpoint for the api call
             ->setEndPoint("v2/gpx/paymentplans/create");
             //returns the value from the results

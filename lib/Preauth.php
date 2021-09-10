@@ -2,7 +2,7 @@
 
 namespace Flutterwave;
 
-require("lib/rave.php");
+require("lib/Rave.php");
 require("lib/raveEventHandlerInterface.php");
 
 use Flutterwave\Rave;
@@ -13,13 +13,13 @@ class preEventHandler implements EventHandlerInterface{
 }
 
 class Preauth {
-    function __construct(){
+    public function __construct(){
         $this->preauthPayment =  new Rave();
     }
 
-    function accountCharge($array){
-        //set the payment handler 
-        $this->payment->eventHandler(new accountEventHandler)
+    public function accountCharge($array){
+
+        $this->payment->setEventHandler(new AcountEventHandler)
         //set the endpoint for the api call
         ->setEndPoint("flwv3-pug/getpaidx/api/charge");
         //returns the value from the results
@@ -33,19 +33,19 @@ class Preauth {
          ***/
     }
 
-    function captureFunds($array){
-        //set the payment handler 
-        $this->plan->eventHandler(new preEventHandler)
+    public function captureFunds($array){
+
+        $this->plan->setEventHandler(new preEventHandler)
         //set the endpoint for the api call
         ->setEndPoint("flwv3-pug/getpaidx/api/capture");
         //returns the value from the results
         return $this->plan->captureFunds($array);
     }
 
-    function refundOrVoid($array){
+    public function refundOrVoid($array){
 
-         //set the payment handler 
-         $this->plan->eventHandler(new preEventHandler)
+ 
+         $this->plan->setEventHandler(new preEventHandler)
          //set the endpoint for the api call
          ->setEndPoint("flwv3-pug/getpaidx/api/refundorvoid");
          //returns the value from the results

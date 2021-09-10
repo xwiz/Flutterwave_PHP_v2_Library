@@ -41,7 +41,7 @@ The request will contain the following parameters.
 // Prevent direct access to this class
 define("BASEPATH", 1);
 
-include('lib/rave.php');
+include('lib/Rave.php');
 include('lib/raveEventHandlerInterface.php');
 
 use Flutterwave\Rave;
@@ -141,7 +141,7 @@ class myEventHandler implements EventHandlerInterface{
 if($postData['amount']){
     // Make payment
     $payment
-    ->eventHandler(new myEventHandler)
+    ->setEventHandler(new myEventHandler)
     ->setAmount($postData['amount'])
     ->setPaymentMethod($postData['payment_method']) // value can be card, account or both
     ->setDescription($postData['description'])
@@ -162,7 +162,7 @@ if($postData['amount']){
     if($getData['cancelled'] && $getData['txref']){
         // Handle canceled payments
         $payment
-        ->eventHandler(new myEventHandler)
+        ->setEventHandler(new myEventHandler)
         ->requeryTransaction($getData['txref'])
         ->paymentCanceled($getData['txref']);
     }elseif($getData['txref']){
@@ -170,7 +170,7 @@ if($postData['amount']){
         $payment->logger->notice('Payment completed. Now requerying payment.');
         
         $payment
-        ->eventHandler(new myEventHandler)
+        ->setEventHandler(new myEventHandler)
         ->requeryTransaction($getData['txref']);
     }else{
         $payment->logger->warn('Stop!!! Please pass the txref parameter!');
