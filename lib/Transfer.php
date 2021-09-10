@@ -3,7 +3,6 @@ namespace Flutterwave;
 
 class Transfer {
     protected $transfer;
-    protected $ev;
 
     public function __construct($eventHandler = null){
         define("CREATE_TRANSFER_ENDPOINT", "v2/gpx/transfers/create");
@@ -14,11 +13,15 @@ class Transfer {
         define("TRANSFER_RETRY_ENDPOINT", "v2/gpx/transfers/retry");
         define("WALLET_TO_WALLET_TRANSFER", "v2/gpx/transfers/wallet");
 
-        $this->transfer = new Rave(fl_get_config('public_key'), fl_get_config('secret_key'), fl_get_config('environment'));
-        if (!$eventHandler) {
-            $this->ev = new SampleEventHandler;
+        if (!$rave) {
+            $this->transfer = new Rave(fl_get_config('public_key'), fl_get_config('secret_key'), fl_get_config('environment'));
+        } else {
+            $this->transfer = $rave;
         }
-        $this->transfer->setEventHandler($this->ev);
+        if (!$this->transfer->getEventHandler()) {
+            $ev = new SampleEventHandler();
+            $this->transfer->setEventHandler($ev);
+        }
     }
 
 

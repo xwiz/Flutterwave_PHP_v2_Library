@@ -509,6 +509,14 @@ class Rave {
     }
     
     /**
+     * Gets the event handler for all available triggers
+     * @return mixed object|null
+     * */
+    public function getEventHandler(){
+        return $this->handler;
+    }
+    
+    /**
      * Requerys a previous transaction from the Rave payment gateway
      * @param string $referenceNumber This should be the reference number of the transaction you want to requery
      * @return object

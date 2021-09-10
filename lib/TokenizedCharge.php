@@ -6,16 +6,17 @@ use Flutterwave\EventHandlerInterface;
 
 class TokenizedCharge {
     protected $payment;
-    protected $ev;
 
-    public function __construct($eventHandler = null){
-        $this->payment = new Rave(fl_get_config('public_key'), fl_get_config('secret_key'), fl_get_config('environment'));
-        if (!$eventHandler) {
-            $this->ev = new CardEventHandler();
+    public function __construct($rave = null){
+        if (!$rave) {
+            $this->payment = new Rave(fl_get_config('public_key'), fl_get_config('secret_key'), fl_get_config('environment'));
         } else {
-            $this->ev = $eventHandler;
+            $this->payment = $rave;
         }
-        $this->payment->setEventHandler($this->ev);
+        if (!$this->payment->getEventHandler()) {
+            $ev = new CardEventHandler();
+            $this->payment->setEventHandler($ev);
+        }
     }
     public function tokenCharge($array){
         //set the endpoint for the api call
